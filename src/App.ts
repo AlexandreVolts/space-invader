@@ -3,6 +3,7 @@ import { Keyboard } from "./Keyboard";
 import { Player } from "./Player";
 import { Projectile } from "./Projectile";
 import { ProjectilePool } from "./ProjectilePool";
+import { TiledBackground } from "./TiledBackground";
 
 export class App
 {
@@ -13,6 +14,7 @@ export class App
 	private readonly canvas: HTMLCanvasElement;
 	private readonly ctx: CanvasRenderingContext2D;
 	private readonly keyboard = new Keyboard();
+	private readonly background = new TiledBackground();
 	private readonly player = new Player();
 	private readonly projectiles: ProjectilePool = new ProjectilePool();
 	private lastDeltaTime = 0;
@@ -43,6 +45,7 @@ export class App
 	public render = (elapsedTime: number) => {
 		this.ctx.clearRect(0, 0, App.WIDTH, App.HEIGHT);
 		this.update((elapsedTime - this.lastDeltaTime) / 1000);
+		this.background.draw(this.ctx);
 		this.projectiles.apply((projectile) => projectile.draw(this.ctx));
 		this.player.draw(this.ctx);
 		this.lastDeltaTime = elapsedTime;
