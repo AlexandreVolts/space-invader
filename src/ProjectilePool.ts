@@ -1,7 +1,8 @@
+import { IDrawable } from "./IDrawable";
 import { Projectile } from "./Projectile";
 import { Vector2 } from "./Vector2";
 
-export class ProjectilePool extends Array<Projectile> {
+export class ProjectilePool extends Array<Projectile> implements IDrawable {
   private static readonly NB_PROJECTILE = 10;
   private static readonly COOLDOWN = 0.25;
   private cooldown = 0;
@@ -13,9 +14,6 @@ export class ProjectilePool extends Array<Projectile> {
 		}
   }
 
-  public update(delta: number) {
-    this.cooldown = this.cooldown > 0 ? this.cooldown - delta : 0;
-  }
   public shoot(position: Vector2) {
     const projectile = this.find((projectile) => projectile.isAvailable);
 		
@@ -27,4 +25,11 @@ export class ProjectilePool extends Array<Projectile> {
   public apply(callback: (item: Projectile) => void) {
 		this.filter((item) => !item.isAvailable).forEach(callback);
 	}
+  public update(delta: number) {
+    this.cooldown = this.cooldown > 0 ? this.cooldown - delta : 0;
+    this.apply((projectile) => projectile.update(delta));
+  }
+  public draw(ctx: CanvasRenderingContext2D) {
+    this.apply((projectile) => projectile.draw(ctx));
+  }
 }

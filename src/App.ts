@@ -1,7 +1,6 @@
-import { IPooledObject } from "./IPooledObject";
+import { IDrawable } from "./IDrawable";
 import { Keyboard } from "./Keyboard";
 import { Player } from "./Player";
-import { Projectile } from "./Projectile";
 import { ProjectilePool } from "./ProjectilePool";
 import { TiledBackground } from "./TiledBackground";
 
@@ -17,6 +16,7 @@ export class App
 	private readonly background = new TiledBackground();
 	private readonly player = new Player();
 	private readonly projectiles: ProjectilePool = new ProjectilePool();
+	private readonly gameElements: IDrawable[] = [];
 	private lastDeltaTime = 0;
 
 	constructor()
@@ -26,6 +26,9 @@ export class App
 		this.canvas.height = App.HEIGHT;
 		this.ctx = this.canvas.getContext("2d")!;
 		this.ctx.imageSmoothingEnabled = false;
+		this.gameElements.push(this.background);
+		this.gameElements.push(this.projectiles)
+		this.gameElements.push(this.player);
 		this.render(0);
 	}
 
@@ -33,21 +36,16 @@ export class App
 		if (this.keyboard.isPressed("ArrowUp") || this.keyboard.isPressed("Space")) {
 			this.projectiles.shoot(this.player.getPosition());
 		}
-		this.projectiles.update(delta);
-		this.projectiles.apply((projectile) => projectile.update(delta));
-
 		this.player.move(
 			this.keyboard.isPressed("ArrowLeft") ? -1 :
 			this.keyboard.isPressed("ArrowRight") ? 1 : 0,
 		);
-		this.player.update(delta);
+		this.gameElements.forEach((elem) => elem.update(delta));
 	}
 	public render = (elapsedTime: number) => {
 		this.ctx.clearRect(0, 0, App.WIDTH, App.HEIGHT);
 		this.update((elapsedTime - this.lastDeltaTime) / 1000);
-		this.background.draw(this.ctx);
-		this.projectiles.apply((projectile) => projectile.draw(this.ctx));
-		this.player.draw(this.ctx);
+		this.gameElements.forEach((elem) => elem.draw(this.ctx));
 		this.lastDeltaTime = elapsedTime;
 		requestAnimationFrame(this.render);
 	}

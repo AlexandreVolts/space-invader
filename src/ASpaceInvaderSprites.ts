@@ -1,7 +1,8 @@
 import { App } from "./App";
+import { IDrawable } from "./IDrawable";
 import { Vector2 } from "./Vector2";
 
-export abstract class ASpaceInvaderSprites {
+export abstract class ASpaceInvaderSprites implements IDrawable {
   private static readonly sprites = document.getElementById('space-invaders') as HTMLImageElement;
   private static readonly SPRITESHEET_COLS = 7;
   private static readonly SPRITESHEET_ROWS = 5;
