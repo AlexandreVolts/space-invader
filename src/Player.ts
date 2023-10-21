@@ -1,5 +1,6 @@
 import { App } from "./App";
 import { ASpaceInvaderSprites } from "./ASpaceInvaderSprites";
+import { Vector2 } from "./Vector2";
 
 export class Player extends ASpaceInvaderSprites {
   private static readonly SPEED_X = 300;
@@ -15,9 +16,10 @@ export class Player extends ASpaceInvaderSprites {
     this.vx = dir * Player.SPEED_X;
   }
   public update(delta: number) {
+    super.update(delta);
     this.position.x += this.vx * delta;
   }
-  public getPosition() {
-    return { ...this.position };
+  public getPosition(): Readonly<Vector2> {
+    return this.position;
   }
 }

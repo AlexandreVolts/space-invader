@@ -13,8 +13,11 @@ export class ProjectilePool extends Array<Projectile> implements IDrawable {
 			this.push(new Projectile());
 		}
   }
+  private apply(callback: (item: Projectile) => void) {
+		this.filter((item) => !item.isAvailable).forEach(callback);
+	}
 
-  public shoot(position: Vector2) {
+  public shoot(position: Readonly<Vector2>) {
     const projectile = this.find((projectile) => projectile.isAvailable);
 		
     if (!projectile || this.cooldown !== 0)
@@ -22,9 +25,6 @@ export class ProjectilePool extends Array<Projectile> implements IDrawable {
     this.cooldown = ProjectilePool.COOLDOWN;
 		projectile.launch(position);
   }
-  public apply(callback: (item: Projectile) => void) {
-		this.filter((item) => !item.isAvailable).forEach(callback);
-	}
   public update(delta: number) {
     this.cooldown = this.cooldown > 0 ? this.cooldown - delta : 0;
     this.apply((projectile) => projectile.update(delta));

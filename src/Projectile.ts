@@ -11,8 +11,8 @@ export class Projectile extends ASpaceInvaderSprites implements IPooledObject {
     super({ x: 2, y: 0 });
   }
 
-  public launch(position: Vector2) {
-    this.position = position;
+  public launch(position: Readonly<Vector2>) {
+    this.position = { ...position };
     this.free = false;
   }
   public kill() {
@@ -24,6 +24,7 @@ export class Projectile extends ASpaceInvaderSprites implements IPooledObject {
       this.kill();
     }
   }
+
   public get isAvailable() {
     return (this.free);
   }

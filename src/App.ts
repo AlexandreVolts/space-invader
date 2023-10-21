@@ -3,6 +3,7 @@ import { Keyboard } from "./Keyboard";
 import { Player } from "./Player";
 import { ProjectilePool } from "./ProjectilePool";
 import { TiledBackground } from "./TiledBackground";
+import { Wave } from "./Wave";
 
 export class App
 {
@@ -13,9 +14,12 @@ export class App
 	private readonly canvas: HTMLCanvasElement;
 	private readonly ctx: CanvasRenderingContext2D;
 	private readonly keyboard = new Keyboard();
+
 	private readonly background = new TiledBackground();
 	private readonly player = new Player();
 	private readonly projectiles: ProjectilePool = new ProjectilePool();
+	private readonly wave = new Wave({x: 5, y: 2});
+
 	private readonly gameElements: IDrawable[] = [];
 	private lastDeltaTime = 0;
 
@@ -27,7 +31,8 @@ export class App
 		this.ctx = this.canvas.getContext("2d")!;
 		this.ctx.imageSmoothingEnabled = false;
 		this.gameElements.push(this.background);
-		this.gameElements.push(this.projectiles)
+		this.gameElements.push(this.projectiles);
+		this.gameElements.push(this.wave);
 		this.gameElements.push(this.player);
 		this.render(0);
 	}

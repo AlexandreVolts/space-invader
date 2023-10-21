@@ -9,17 +9,25 @@ export abstract class ASpaceInvaderSprites implements IDrawable {
   private static readonly TILE_WIDTH = ASpaceInvaderSprites.sprites.width / ASpaceInvaderSprites.SPRITESHEET_COLS;
   private static readonly TILE_HEIGHT = ASpaceInvaderSprites.sprites.height / ASpaceInvaderSprites.SPRITESHEET_ROWS;
   protected position: Vector2 = { x: 0, y: 0 };
+  private frame = 0;
 
   constructor(
     private readonly gridPos: Readonly<Vector2>,
+    private readonly animationBox: Readonly<Vector2> = { x: 0, y: 0 },
     private readonly width = 1,
   ) {}
 
+  public update(delta: number) {
+    this.frame += delta;
+    if (this.frame > this.animationBox.x + 1 && this.frame > this.animationBox.y + 1) {
+      this.frame = 0;
+    }
+  }
   public draw(ctx: CanvasRenderingContext2D) {
     ctx.drawImage(
       ASpaceInvaderSprites.sprites,
-      this.gridPos.x * ASpaceInvaderSprites.TILE_WIDTH,
-      this.gridPos.y * ASpaceInvaderSprites.TILE_HEIGHT,
+      (this.gridPos.x + (~~this.frame) * Math.sign(this.animationBox.x)) * ASpaceInvaderSprites.TILE_WIDTH,
+      (this.gridPos.y + (~~this.frame) * Math.sign(this.animationBox.y)) * ASpaceInvaderSprites.TILE_HEIGHT,
       this.width * ASpaceInvaderSprites.TILE_WIDTH,
       ASpaceInvaderSprites.TILE_HEIGHT,
       this.position.x, this.position.y,
@@ -27,6 +35,4 @@ export abstract class ASpaceInvaderSprites implements IDrawable {
       App.TILE_SIZE,
     )
   }
-  
-  public abstract update(delta: number): void;
 }
