@@ -8,7 +8,7 @@ import { Wave } from "./Wave";
 export class App
 {
 	private static readonly COEFF = 0.6;
-	public static readonly TILE_SIZE = 50;
+	public static readonly TILE_SIZE = 40;
 	public static readonly WIDTH = 720 * App.COEFF;
 	public static readonly HEIGHT = 1280 * App.COEFF;
 	private readonly canvas: HTMLCanvasElement;
@@ -18,7 +18,7 @@ export class App
 	private readonly background = new TiledBackground();
 	private readonly player = new Player();
 	private readonly projectiles: ProjectilePool = new ProjectilePool();
-	private readonly wave = new Wave({x: 5, y: 2});
+	private readonly wave = new Wave({ x: 8, y: 3 });
 
 	private readonly gameElements: IDrawable[] = [];
 	private lastDeltaTime = 0;
@@ -45,6 +45,7 @@ export class App
 			this.keyboard.isPressed("ArrowLeft") ? -1 :
 			this.keyboard.isPressed("ArrowRight") ? 1 : 0,
 		);
+		this.wave.analyseProjectiles(this.projectiles);
 		this.gameElements.forEach((elem) => elem.update(delta));
 	}
 	public render = (elapsedTime: number) => {

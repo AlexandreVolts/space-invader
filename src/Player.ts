@@ -18,6 +18,7 @@ export class Player extends ASpaceInvaderSprites {
   public update(delta: number) {
     super.update(delta);
     this.position.x += this.vx * delta;
+    this.position.x = Math.max(0, Math.min(App.WIDTH - App.TILE_SIZE, this.position.x));
   }
   public getPosition(): Readonly<Vector2> {
     return this.position;

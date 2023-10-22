@@ -3,8 +3,8 @@ import { Projectile } from "./Projectile";
 import { Vector2 } from "./Vector2";
 
 export class ProjectilePool extends Array<Projectile> implements IDrawable {
-  private static readonly NB_PROJECTILE = 10;
-  private static readonly COOLDOWN = 0.25;
+  private static readonly NB_PROJECTILE = 5;
+  private static readonly COOLDOWN = 0.4;
   private cooldown = 0;
 
   constructor() {
@@ -13,10 +13,10 @@ export class ProjectilePool extends Array<Projectile> implements IDrawable {
 			this.push(new Projectile());
 		}
   }
-  private apply(callback: (item: Projectile) => void) {
+  
+  public apply(callback: (item: Projectile) => void) {
 		this.filter((item) => !item.isAvailable).forEach(callback);
 	}
-
   public shoot(position: Readonly<Vector2>) {
     const projectile = this.find((projectile) => projectile.isAvailable);
 		

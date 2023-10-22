@@ -4,7 +4,7 @@ import { Vector2 } from "./Vector2";
 import { App } from "./App";
 
 export class Projectile extends ASpaceInvaderSprites implements IPooledObject {
-  private vy = -500;
+  private vy = -400;
   private free = true;
 
   constructor() {
@@ -25,6 +25,12 @@ export class Projectile extends ASpaceInvaderSprites implements IPooledObject {
     }
   }
 
+  public getHitPoint() {
+    return ({
+      x: this.position.x + App.TILE_SIZE * 0.5,
+      y: this.position.y,
+    });
+  }
   public get isAvailable() {
     return (this.free);
   }
