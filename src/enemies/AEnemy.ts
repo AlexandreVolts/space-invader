@@ -1,11 +1,12 @@
 import { ASpaceInvaderSprites } from "../ASpaceInvaderSprites";
 import { App } from "../App";
+import { IPooledObject } from "../IPooledObject";
 import { Vector2 } from "../Vector2";
 
-export abstract class AEnemy extends ASpaceInvaderSprites {
+export abstract class AEnemy extends ASpaceInvaderSprites implements IPooledObject {
   private _isAlive = true;
 
-  constructor(gridPos: Readonly<Vector2>) {
+  constructor(gridPos: Readonly<Vector2>, public readonly score: number) {
     super(gridPos, { x: 1, y: 0 });
   }
 
@@ -19,5 +20,8 @@ export abstract class AEnemy extends ASpaceInvaderSprites {
   }
   public kill() {
     this._isAlive = false;
+  }
+  public get isAlive() {
+    return (this._isAlive);
   }
 }

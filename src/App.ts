@@ -7,10 +7,11 @@ import { Wave } from "./Wave";
 
 export class App
 {
-	private static readonly COEFF = 0.6;
+	private static readonly GAME_SIZE_COEFF = 0.6;
+	private static readonly SCORE_MULTIPLIER = 100;
 	public static readonly TILE_SIZE = 40;
-	public static readonly WIDTH = 720 * App.COEFF;
-	public static readonly HEIGHT = 1280 * App.COEFF;
+	public static readonly WIDTH = 720 * App.GAME_SIZE_COEFF;
+	public static readonly HEIGHT = 1280 * App.GAME_SIZE_COEFF;
 	private readonly canvas: HTMLCanvasElement;
 	private readonly ctx: CanvasRenderingContext2D;
 	private readonly keyboard = new Keyboard();
@@ -21,6 +22,7 @@ export class App
 	private readonly wave = new Wave({ x: 8, y: 3 });
 
 	private readonly gameElements: IDrawable[] = [];
+	private score = 0;
 	private lastDeltaTime = 0;
 
 	constructor()
@@ -30,6 +32,7 @@ export class App
 		this.canvas.height = App.HEIGHT;
 		this.ctx = this.canvas.getContext("2d")!;
 		this.ctx.imageSmoothingEnabled = false;
+		this.ctx.font = '20px Joystick';
 		this.gameElements.push(this.background);
 		this.gameElements.push(this.projectiles);
 		this.gameElements.push(this.wave);
@@ -45,13 +48,18 @@ export class App
 			this.keyboard.isPressed("ArrowLeft") ? -1 :
 			this.keyboard.isPressed("ArrowRight") ? 1 : 0,
 		);
-		this.wave.analyseProjectiles(this.projectiles);
+		this.score += this.wave.analyseProjectiles(this.projectiles);
 		this.gameElements.forEach((elem) => elem.update(delta));
 	}
 	public render = (elapsedTime: number) => {
 		this.ctx.clearRect(0, 0, App.WIDTH, App.HEIGHT);
 		this.update((elapsedTime - this.lastDeltaTime) / 1000);
 		this.gameElements.forEach((elem) => elem.draw(this.ctx));
+		this.ctx.fillStyle = 'white';
+		this.ctx.textAlign = 'right';
+		this.ctx.textBaseline = 'top';
+		this.ctx.fillText('Score: ', App.WIDTH - 100, 10);
+		this.ctx.fillText(`${this.score * App.SCORE_MULTIPLIER}`, App.WIDTH - 10, 10);
 		this.lastDeltaTime = elapsedTime;
 		requestAnimationFrame(this.render);
 	}

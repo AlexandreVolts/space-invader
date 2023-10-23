@@ -1,3 +1,3 @@
 export interface IPooledObject {
-  get isAvailable(): boolean;
+  get isAlive(): boolean;
 }

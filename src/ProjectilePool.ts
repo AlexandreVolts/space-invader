@@ -15,10 +15,10 @@ export class ProjectilePool extends Array<Projectile> implements IDrawable {
   }
   
   public apply(callback: (item: Projectile) => void) {
-		this.filter((item) => !item.isAvailable).forEach(callback);
+		this.filter((item) => item.isAlive).forEach(callback);
 	}
   public shoot(position: Readonly<Vector2>) {
-    const projectile = this.find((projectile) => projectile.isAvailable);
+    const projectile = this.find((projectile) => !projectile.isAlive);
 		
     if (!projectile || this.cooldown !== 0)
 			return;

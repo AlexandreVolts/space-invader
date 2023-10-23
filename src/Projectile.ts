@@ -31,7 +31,7 @@ export class Projectile extends ASpaceInvaderSprites implements IPooledObject {
       y: this.position.y,
     });
   }
-  public get isAvailable() {
-    return (this.free);
+  public get isAlive() {
+    return (!this.free);
   }
 }

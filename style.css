@@ -1,3 +1,7 @@
+@font-face {
+  font-family: "Joystick";
+  src: url("/assets/joystix-monospace.otf");
+}
 html, body {
   margin: 0;
   padding: 0;
