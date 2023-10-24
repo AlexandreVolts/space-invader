@@ -13,15 +13,10 @@ export class Wave extends Array<AEnemy> implements IDrawable {
 
   constructor(private readonly size: Readonly<Vector2>) {
     super();
-    this.velocity.x = Wave.DEFAULT_SPEED;
-    for (let y = 0; y < size.y; y++) {
-      for (let x = 0; x < size.x; x++) {
-        this.push(new Crab({ x: x * App.TILE_SIZE, y: y * App.TILE_SIZE + App.TILE_SIZE }));
-      }
-    }
+    this.reset();
   }
 
-  private getHoirizontalPadding(dir: -1 | 1) {
+  private getHorizontalPadding(dir: -1 | 1) {
     let x = dir === -1 ? this.size.x - 1 : 0;
     let y = 0;
     let selected = this[x + y * this.size.x];
@@ -59,9 +54,22 @@ export class Wave extends Array<AEnemy> implements IDrawable {
     });
     return (score);
   }
+  public reset() {
+    if (this.length > 0) {
+      this.splice(0, this.length);
+    }
+    for (let y = 0; y < this.size.y; y++) {
+      for (let x = 0; x < this.size.x; x++) {
+        this.push(new Crab({ x: x * App.TILE_SIZE, y: y * App.TILE_SIZE + App.TILE_SIZE }));
+      }
+    }
+    this.position.x = 0;
+    this.position.y = 0;
+    this.velocity.x = Wave.DEFAULT_SPEED;
+  }
   public update(delta: number) {
-    const leftPadding = -this.getHoirizontalPadding(1) * App.TILE_SIZE;
-    const rightPadding = App.WIDTH + this.getHoirizontalPadding(-1) * App.TILE_SIZE;
+    const leftPadding = -this.getHorizontalPadding(1) * App.TILE_SIZE;
+    const rightPadding = App.WIDTH + this.getHorizontalPadding(-1) * App.TILE_SIZE;
 
     this.position.x += this.velocity.x * delta;
     this.position.y += this.velocity.y * delta;
@@ -72,7 +80,6 @@ export class Wave extends Array<AEnemy> implements IDrawable {
     this.position.x = Math.max(leftPadding, Math.min(rightPadding - this.size.x * App.TILE_SIZE, this.position.x));
     this.position.y += App.TILE_SIZE;
     this.velocity.x *= -1 * Wave.SPEED_ACCELERATION;
-    console.log(this.getVerticalSize());
   }
   public draw(ctx: CanvasRenderingContext2D) {
     ctx.translate(this.position.x, this.position.y);

@@ -41,6 +41,11 @@ export class App
 	}
 
 	public update(delta: number) {
+		if (this.isFinished && this.keyboard.isPressed('Enter')) {
+			this.isFinished = false;
+			this.score = 0;
+			this.wave.reset();
+		}
 		if (this.keyboard.isPressed("ArrowUp") || this.keyboard.isPressed("Space")) {
 			this.projectiles.shoot(this.player.getPosition());
 		}
@@ -67,7 +72,9 @@ export class App
 		if (this.isFinished) {
 			this.ctx.font = '40px Joystick';
 			this.ctx.textAlign = 'center';
-			this.ctx.fillText('Game over', App.WIDTH * 0.5, App.HEIGHT * 0.5)
+			this.ctx.fillText('Game over', App.WIDTH * 0.5, App.HEIGHT * 0.3);
+			this.ctx.font = '15px Joystick';
+			this.ctx.fillText('Press Enter to restart', App.WIDTH * 0.5, App.HEIGHT * 0.5);
 		}
 		this.lastDeltaTime = elapsedTime;
 		requestAnimationFrame(this.render);
