@@ -21,7 +21,7 @@ export class Wave extends Array<AEnemy> implements IDrawable {
     }
   }
 
-  private getPadding(dir: -1 | 1) {
+  private getHoirizontalPadding(dir: -1 | 1) {
     let x = dir === -1 ? this.size.x - 1 : 0;
     let y = 0;
     let selected = this[x + y * this.size.x];
@@ -32,6 +32,12 @@ export class Wave extends Array<AEnemy> implements IDrawable {
       x += y === 0 ? dir : 0;
     }
     return (dir === 1 ? x : this.size.x - 1 - x);
+  }
+  private getVerticalSize() {
+    let i = this.length - 1;
+
+    for (; i >= 0 && !this[i].isAlive; i--);
+    return (~~(i / this.size.x) + 1);
   }
 
   public analyseProjectiles(projectiles: Readonly<ProjectilePool>) {
@@ -54,8 +60,8 @@ export class Wave extends Array<AEnemy> implements IDrawable {
     return (score);
   }
   public update(delta: number) {
-    const leftPadding = -this.getPadding(1) * App.TILE_SIZE;
-    const rightPadding = App.WIDTH + this.getPadding(-1) * App.TILE_SIZE;
+    const leftPadding = -this.getHoirizontalPadding(1) * App.TILE_SIZE;
+    const rightPadding = App.WIDTH + this.getHoirizontalPadding(-1) * App.TILE_SIZE;
 
     this.position.x += this.velocity.x * delta;
     this.position.y += this.velocity.y * delta;
@@ -66,10 +72,20 @@ export class Wave extends Array<AEnemy> implements IDrawable {
     this.position.x = Math.max(leftPadding, Math.min(rightPadding - this.size.x * App.TILE_SIZE, this.position.x));
     this.position.y += App.TILE_SIZE;
     this.velocity.x *= -1 * Wave.SPEED_ACCELERATION;
+    console.log(this.getVerticalSize());
   }
   public draw(ctx: CanvasRenderingContext2D) {
     ctx.translate(this.position.x, this.position.y);
     this.filter((enemy) => enemy.isAlive).forEach((enemy) => enemy.draw(ctx));
     ctx.translate(-this.position.x, -this.position.y);
+  }
+
+  public get areAllEnemiesDead() {
+    return (this.filter((enemy) => enemy.isAlive).length === 0);
+  }
+  public get hasReachedLimit() {
+    const bottomY = this.position.y + this.getVerticalSize() * App.TILE_SIZE;
+
+    return (bottomY >= App.HEIGHT - App.TILE_SIZE * 3);
   }
 }

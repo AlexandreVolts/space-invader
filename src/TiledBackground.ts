@@ -30,5 +30,9 @@ export class TiledBackground implements IDrawable {
         }
       }
     }
+    ctx.strokeStyle = 'white';
+		ctx.moveTo(0, App.HEIGHT - App.TILE_SIZE * 2);
+		ctx.lineTo(App.WIDTH, App.HEIGHT - App.TILE_SIZE * 2);
+		ctx.stroke();
   }
 }
