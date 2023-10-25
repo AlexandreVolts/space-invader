@@ -1,15 +1,18 @@
 import { App } from "./App";
 import { IDrawable } from "./IDrawable";
-import { ProjectilePool } from "./ProjectilePool";
+import { ProjectilePool } from "./pools/ProjectilePool";
 import { Vector2 } from "./Vector2";
 import { AEnemy } from "./enemies/AEnemy";
-import { Crab } from "./enemies/Crab";
+import { Crane } from "./enemies/Crane";
+import { Pool } from "./pools/Pool";
+import { Explosion } from "./Explosion";
 
 export class Wave extends Array<AEnemy> implements IDrawable {
   private static readonly DEFAULT_SPEED = 20;
   private static readonly SPEED_ACCELERATION = 1.15;
   private readonly position: Vector2 = { x: 0, y: 0 };
   private readonly velocity: Vector2 = { x: 0, y: 0 };
+  private readonly explosions = new Pool(...Array.from({ length: 4 }).map(() => new Explosion()));
 
   constructor(private readonly size: Readonly<Vector2>) {
     super();
@@ -19,10 +22,11 @@ export class Wave extends Array<AEnemy> implements IDrawable {
   private getHorizontalPadding(dir: -1 | 1) {
     let x = dir === -1 ? this.size.x - 1 : 0;
     let y = 0;
-    let selected = this[x + y * this.size.x];
+    let index = x + y * this.size.x;
+    let selected = this[index];
 
-    while(!selected.isAlive) {
-      selected = this[x + y * this.size.x];
+    for (; !selected.isAlive && index >= 0 && index < this.size.x * this.size.y; index = x + y * this.size.x) {
+      selected = this[index];
       y = (y + 1) % this.size.y;
       x += y === 0 ? dir : 0;
     }
@@ -47,9 +51,12 @@ export class Wave extends Array<AEnemy> implements IDrawable {
         if (!enemy.collidesWith(position)) {
           return;
         }
-        enemy.kill();
+        enemy.hit();
         projectile.kill();
-        score += enemy.score;
+        if (!enemy.isAlive) {
+          score += enemy.score;
+          this.explosions.trigger(position);
+        }
       });
     });
     return (score);
@@ -60,7 +67,7 @@ export class Wave extends Array<AEnemy> implements IDrawable {
     }
     for (let y = 0; y < this.size.y; y++) {
       for (let x = 0; x < this.size.x; x++) {
-        this.push(new Crab({ x: x * App.TILE_SIZE, y: y * App.TILE_SIZE + App.TILE_SIZE }));
+        this.push(new Crane({ x: x * App.TILE_SIZE, y: y * App.TILE_SIZE + App.TILE_SIZE }));
       }
     }
     this.position.x = 0;
@@ -74,6 +81,7 @@ export class Wave extends Array<AEnemy> implements IDrawable {
     this.position.x += this.velocity.x * delta;
     this.position.y += this.velocity.y * delta;
     this.forEach((enemy) => enemy.update(delta));
+    this.explosions.update(delta);
     if (this.position.x >= leftPadding && this.position.x + this.size.x * App.TILE_SIZE <= rightPadding) {
       return;
     }
@@ -84,6 +92,7 @@ export class Wave extends Array<AEnemy> implements IDrawable {
   public draw(ctx: CanvasRenderingContext2D) {
     ctx.translate(this.position.x, this.position.y);
     this.filter((enemy) => enemy.isAlive).forEach((enemy) => enemy.draw(ctx));
+    this.explosions.draw(ctx);
     ctx.translate(-this.position.x, -this.position.y);
   }
 

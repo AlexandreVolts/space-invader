@@ -1,4 +1,4 @@
-import { IPooledObject } from "./IPooledObject";
+import { IPooledObject } from "./pools/IPooledObject";
 import { ASpaceInvaderSprites } from "./ASpaceInvaderSprites";
 import { Vector2 } from "./Vector2";
 import { App } from "./App";
@@ -11,7 +11,7 @@ export class Projectile extends ASpaceInvaderSprites implements IPooledObject {
     super({ x: 2, y: 0 });
   }
 
-  public launch(position: Readonly<Vector2>) {
+  public trigger(position: Readonly<Vector2>) {
     this.position = { ...position };
     this.free = false;
   }

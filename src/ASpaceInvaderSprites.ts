@@ -9,7 +9,7 @@ export abstract class ASpaceInvaderSprites implements IDrawable {
   private static readonly TILE_WIDTH = ASpaceInvaderSprites.sprites.width / ASpaceInvaderSprites.SPRITESHEET_COLS;
   private static readonly TILE_HEIGHT = ASpaceInvaderSprites.sprites.height / ASpaceInvaderSprites.SPRITESHEET_ROWS;
   protected position: Vector2 = { x: 0, y: 0 };
-  private frame = 0;
+  protected frame = 0;
 
   constructor(
     private readonly gridPos: Readonly<Vector2>,

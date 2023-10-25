@@ -1,7 +1,9 @@
+import { Explosion } from "./Explosion";
 import { IDrawable } from "./IDrawable";
 import { Keyboard } from "./Keyboard";
 import { Player } from "./Player";
-import { ProjectilePool } from "./ProjectilePool";
+import { Pool } from "./pools/Pool";
+import { ProjectilePool } from "./pools/ProjectilePool";
 import { TiledBackground } from "./TiledBackground";
 import { Wave } from "./Wave";
 
@@ -41,21 +43,23 @@ export class App
 	}
 
 	public update(delta: number) {
+		const score = this.wave.analyseProjectiles(this.projectiles);
+
 		if (this.isFinished && this.keyboard.isPressed('Enter')) {
 			this.isFinished = false;
 			this.score = 0;
 			this.wave.reset();
 		}
 		if (this.keyboard.isPressed("ArrowUp") || this.keyboard.isPressed("Space")) {
-			this.projectiles.shoot(this.player.getPosition());
+			this.projectiles.trigger(this.player.getPosition());
+		}
+		if (!this.isFinished) {
+			this.score += score;
 		}
 		this.player.move(
 			this.keyboard.isPressed("ArrowLeft") ? -1 :
 			this.keyboard.isPressed("ArrowRight") ? 1 : 0,
 		);
-		if (!this.isFinished) {
-			this.score += this.wave.analyseProjectiles(this.projectiles);
-		}
 		this.isFinished = this.wave.hasReachedLimit;
 		this.gameElements.forEach((elem) => elem.update(delta));
 	}
