@@ -1,8 +1,6 @@
-import { Explosion } from "./Explosion";
 import { IDrawable } from "./IDrawable";
 import { Keyboard } from "./Keyboard";
 import { Player } from "./Player";
-import { Pool } from "./pools/Pool";
 import { ProjectilePool } from "./pools/ProjectilePool";
 import { TiledBackground } from "./TiledBackground";
 import { Wave } from "./Wave";
@@ -20,7 +18,8 @@ export class App
 
 	private readonly background = new TiledBackground();
 	private readonly player = new Player();
-	private readonly projectiles: ProjectilePool = new ProjectilePool();
+	private readonly playerProjectiles: ProjectilePool = new ProjectilePool(5);
+	private readonly enemyProjectiles = new ProjectilePool(5, 1);
 	private readonly wave = new Wave({ x: 8, y: 3 });
 
 	private readonly gameElements: IDrawable[] = [];
@@ -36,37 +35,56 @@ export class App
 		this.ctx = this.canvas.getContext("2d")!;
 		this.ctx.imageSmoothingEnabled = false;
 		this.gameElements.push(this.background);
-		this.gameElements.push(this.projectiles);
+		this.gameElements.push(this.playerProjectiles);
+		this.gameElements.push(this.enemyProjectiles);
 		this.gameElements.push(this.wave);
 		this.gameElements.push(this.player);
 		this.render(0);
 	}
 
+	private reset() {
+		this.isFinished = false;
+		this.score = 0;
+		this.wave.reset();
+		this.playerProjectiles.reset();
+		this.enemyProjectiles.reset();
+	}
+
 	public update(delta: number) {
-		const score = this.wave.analyseProjectiles(this.projectiles);
+		const score = this.wave.analyseProjectiles(this.playerProjectiles);
 
 		if (this.isFinished && this.keyboard.isPressed('Enter')) {
-			this.isFinished = false;
-			this.score = 0;
-			this.wave.reset();
-		}
-		if (this.keyboard.isPressed("ArrowUp") || this.keyboard.isPressed("Space")) {
-			this.projectiles.trigger(this.player.getPosition());
+			this.reset();
 		}
 		if (!this.isFinished) {
-			this.score += score;
+			if (this.keyboard.isPressed("ArrowUp") || this.keyboard.isPressed("Space")) {
+				this.playerProjectiles.trigger(this.player.getPosition());
+			}
 		}
+		this.score += score;
+		this.wave.getShotPositions().forEach((position) => this.enemyProjectiles.trigger(position));
+		this.enemyProjectiles.apply((projectile) => {
+			if (this.player.collidesWith(projectile.getHitPoint())) {
+				this.isFinished = true;
+				projectile.kill();
+			}
+		});
 		this.player.move(
 			this.keyboard.isPressed("ArrowLeft") ? -1 :
 			this.keyboard.isPressed("ArrowRight") ? 1 : 0,
 		);
-		this.isFinished = this.wave.hasReachedLimit;
+		if (this.wave.hasReachedLimit)
+			this.isFinished = true;
 		this.gameElements.forEach((elem) => elem.update(delta));
 	}
 	public render = (elapsedTime: number) => {
 		this.ctx.clearRect(0, 0, App.WIDTH, App.HEIGHT);
 		this.update((elapsedTime - this.lastDeltaTime) / 1000);
-		this.gameElements.forEach((elem) => elem.draw(this.ctx));
+		this.gameElements.forEach((elem) => {
+			if (this.isFinished && elem instanceof Player)
+				return;
+			elem.draw(this.ctx);
+		});
 		this.ctx.font = '20px Joystick';
 		this.ctx.fillStyle = 'green';
 		this.ctx.textAlign = 'right';

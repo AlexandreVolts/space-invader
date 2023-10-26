@@ -1,16 +1,19 @@
+import { Direction } from "../Direction";
 import { Projectile } from "../Projectile";
 import { Vector2 } from "../Vector2";
 import { Pool } from "./Pool";
 
 export class ProjectilePool extends Pool<Projectile> {
-  private static readonly NB_PROJECTILE = 5;
   private static readonly COOLDOWN = 0.4;
   private cooldown = 0;
 
-  constructor() {
-    super(...Array.from({ length: ProjectilePool.NB_PROJECTILE }).map(() => new Projectile()));
+  constructor(size: number, dir: Direction = -1) {
+    super(...Array.from({ length: size }).map(() => new Projectile(dir)));
   }
   
+  public reset() {
+    this.forEach((item) => item.kill());
+  }
   public trigger(position: Readonly<Vector2>) {
     if (this.cooldown > 0)
 			return;

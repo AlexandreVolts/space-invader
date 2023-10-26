@@ -2,13 +2,15 @@ import { IPooledObject } from "./pools/IPooledObject";
 import { ASpaceInvaderSprites } from "./ASpaceInvaderSprites";
 import { Vector2 } from "./Vector2";
 import { App } from "./App";
+import { Direction } from "./Direction";
 
 export class Projectile extends ASpaceInvaderSprites implements IPooledObject {
-  private vy = -400;
+  private vy = 400;
   private free = true;
 
-  constructor() {
+  constructor(dir: Direction = -1) {
     super({ x: 2, y: 0 });
+    this.vy *= dir;
   }
 
   public trigger(position: Readonly<Vector2>) {
@@ -20,7 +22,7 @@ export class Projectile extends ASpaceInvaderSprites implements IPooledObject {
   }
   public update(delta: number) {
     this.position.y += this.vy * delta;
-    if (this.position.y < -App.TILE_SIZE) {
+    if (this.position.y < -App.TILE_SIZE || this.position.y > App.HEIGHT) {
       this.kill();
     }
   }

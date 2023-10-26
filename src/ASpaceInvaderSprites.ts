@@ -17,6 +17,14 @@ export abstract class ASpaceInvaderSprites implements IDrawable {
     private readonly width = 1,
   ) {}
 
+  public collidesWith(point: Readonly<Vector2>) {
+    return (
+      point.x > this.position.x &&
+      point.y > this.position.y &&
+      point.x < this.position.x + App.TILE_SIZE &&
+      point.y < this.position.y + App.TILE_SIZE * 0.5
+    );
+  }
   public update(delta: number) {
     this.frame += delta;
     if (this.frame > this.animationBox.x + 1 && this.frame > this.animationBox.y + 1) {
