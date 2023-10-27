@@ -2,6 +2,7 @@ import { IDrawable } from "./IDrawable";
 import { Keyboard } from "./Keyboard";
 import { Player } from "./Player";
 import { ProjectilePool } from "./pools/ProjectilePool";
+import { Shield } from "./Shield";
 import { TiledBackground } from "./TiledBackground";
 import { Wave } from "./Wave";
 
@@ -9,6 +10,7 @@ export class App
 {
 	private static readonly GAME_SIZE_COEFF = 0.6;
 	private static readonly SCORE_MULTIPLIER = 100;
+	private static readonly NB_SHIELDS = 4;
 	public static readonly TILE_SIZE = 40;
 	public static readonly WIDTH = 720 * App.GAME_SIZE_COEFF;
 	public static readonly HEIGHT = 1280 * App.GAME_SIZE_COEFF;
@@ -20,6 +22,7 @@ export class App
 	private readonly player = new Player();
 	private readonly playerProjectiles: ProjectilePool = new ProjectilePool(5);
 	private readonly enemyProjectiles = new ProjectilePool(5, 1);
+	private readonly shields: Shield[] = [];
 	private readonly wave = new Wave({ x: 8, y: 3 });
 
 	private readonly gameElements: IDrawable[] = [];
@@ -34,9 +37,16 @@ export class App
 		this.canvas.height = App.HEIGHT;
 		this.ctx = this.canvas.getContext("2d")!;
 		this.ctx.imageSmoothingEnabled = false;
+		Array.from({ length: App.NB_SHIELDS }).forEach((_, index) => {
+			const width = App.WIDTH - App.TILE_SIZE;
+			const x = App.TILE_SIZE * 0.75 + width * (index / App.NB_SHIELDS);
+
+			this.shields.push(new Shield(x));
+		});
 		this.gameElements.push(this.background);
 		this.gameElements.push(this.playerProjectiles);
 		this.gameElements.push(this.enemyProjectiles);
+		this.gameElements.push(...this.shields);
 		this.gameElements.push(this.wave);
 		this.gameElements.push(this.player);
 		this.render(0);
@@ -48,6 +58,7 @@ export class App
 		this.wave.reset();
 		this.playerProjectiles.reset();
 		this.enemyProjectiles.reset();
+		this.shields.forEach((shield) => shield.reset());
 	}
 
 	public update(delta: number) {
@@ -62,13 +73,19 @@ export class App
 			}
 		}
 		this.score += score;
-		this.wave.getShotPositions().forEach((position) => this.enemyProjectiles.trigger(position));
 		this.enemyProjectiles.apply((projectile) => {
+			this.shields.filter((shield) => shield.isAlive).forEach((shield) => {
+				if (shield.collidesWith(projectile.getHitPoint())) {
+					shield.hit();
+					projectile.kill();
+				}
+			});
 			if (this.player.collidesWith(projectile.getHitPoint())) {
 				this.isFinished = true;
 				projectile.kill();
 			}
 		});
+		this.wave.getShotPositions().forEach((position) => this.enemyProjectiles.trigger(position));
 		this.player.move(
 			this.keyboard.isPressed("ArrowLeft") ? -1 :
 			this.keyboard.isPressed("ArrowRight") ? 1 : 0,

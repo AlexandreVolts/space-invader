@@ -21,7 +21,7 @@ export abstract class ASpaceInvaderSprites implements IDrawable {
     return (
       point.x > this.position.x &&
       point.y > this.position.y &&
-      point.x < this.position.x + App.TILE_SIZE &&
+      point.x < this.position.x + App.TILE_SIZE * this.width &&
       point.y < this.position.y + App.TILE_SIZE * 0.5
     );
   }

@@ -1,14 +1,10 @@
-import { ASpaceInvaderSprites } from "../ASpaceInvaderSprites";
-import { App } from "../App";
+import { ABlinkSprite } from "../ABlinkSprite";
 import { Vector2 } from "../Vector2";
 import { rand } from "../rand";
 
-export abstract class AEnemy extends ASpaceInvaderSprites {
-  private static readonly HIT_MARKER_DURATION = 0.75;
-  private static readonly HIT_MARKER_BLINK_RATE = 0.2;
+export abstract class AEnemy extends ABlinkSprite {
   private static readonly MIN_COOLDOWN = 2.5;
   private static readonly MAX_COOLDOWN = 20;
-  private hitMarker = 0;
   private cooldown = rand(AEnemy.MIN_COOLDOWN, AEnemy.MAX_COOLDOWN);
 
   constructor(gridPos: Readonly<Vector2>, public readonly score: number, private lives = 2) {
@@ -17,7 +13,7 @@ export abstract class AEnemy extends ASpaceInvaderSprites {
 
   public hit() {
     this.lives--;
-    this.hitMarker = AEnemy.HIT_MARKER_DURATION;
+    this.blink();
   }
   public shoot(): Vector2 | undefined {
     if (this.cooldown > 0)
@@ -27,14 +23,7 @@ export abstract class AEnemy extends ASpaceInvaderSprites {
   }
   public update(delta: number) {
     super.update(delta);
-    this.hitMarker -= this.hitMarker <= 0 ? 0 : delta;
     this.cooldown -= delta;
-  }
-  public draw(ctx: CanvasRenderingContext2D) {
-    if (this.hitMarker % AEnemy.HIT_MARKER_BLINK_RATE > AEnemy.HIT_MARKER_BLINK_RATE * 0.5) {
-      return;
-    }
-    super.draw(ctx);
   }
 
   public get isAlive() {
