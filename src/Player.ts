@@ -3,7 +3,7 @@ import { ASpaceInvaderSprites } from "./ASpaceInvaderSprites";
 import { Vector2 } from "./Vector2";
 
 export class Player extends ASpaceInvaderSprites {
-  private static readonly SPEED_X = 300;
+  private static readonly SPEED_X = 200;
   private vx = 0;
 
   constructor() {

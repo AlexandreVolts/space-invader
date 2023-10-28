@@ -5,7 +5,7 @@ import { App } from "./App";
 import { Direction } from "./Direction";
 
 export class Projectile extends ASpaceInvaderSprites implements IPooledObject {
-  private vy = 400;
+  private vy = 500;
   private free = true;
 
   constructor(dir: Direction = -1) {

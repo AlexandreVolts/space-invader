@@ -8,20 +8,22 @@ import { Explosion } from "./Explosion";
 import { Crab } from "./enemies/Crab";
 import { Direction } from "./Direction";
 
-export class Wave extends Array<AEnemy> implements IDrawable {
+export class Wave extends Array<AEnemy|null> implements IDrawable {
   private static readonly DEFAULT_SPEED = 20;
   private static readonly SPEED_ACCELERATION = 1.15;
   private readonly position: Vector2 = { x: 0, y: 0 };
-  private readonly velocity: Vector2 = { x: 0, y: 0 };
+  private readonly velocity: Vector2 = { x: Wave.DEFAULT_SPEED, y: 0 };
   private readonly explosions = new Pool(
     ...Array.from({ length: 4 }).map(() => new Explosion())
   );
 
   constructor(private readonly size: Readonly<Vector2>) {
     super();
-    this.reset();
   }
 
+  private apply(callback: (enemy: AEnemy) => void) {
+    (this.filter((enemy) => enemy?.isAlive) as AEnemy[]).forEach(callback);
+  }
   private getHorizontalPadding(dir: Direction) {
     let x = dir === -1 ? this.size.x - 1 : 0;
     let y = 0;
@@ -30,7 +32,7 @@ export class Wave extends Array<AEnemy> implements IDrawable {
 
     for (
       ;
-      !selected.isAlive && index >= 0 && index < this.size.x * this.size.y;
+      !selected?.isAlive && index >= 0 && index < this.size.x * this.size.y;
       index = x + y * this.size.x
     ) {
       selected = this[index];
@@ -42,7 +44,7 @@ export class Wave extends Array<AEnemy> implements IDrawable {
   private getVerticalSize() {
     let i = this.length - 1;
 
-    for (; i >= 0 && !this[i].isAlive; i--);
+    for (; i >= 0 && !this[i]?.isAlive; i--);
     return ~~(i / this.size.x) + 1;
   }
 
@@ -54,7 +56,7 @@ export class Wave extends Array<AEnemy> implements IDrawable {
         x: projectile.getHitPoint().x - this.position.x,
         y: projectile.getHitPoint().y - this.position.y,
       };
-      this.filter((enemy) => enemy.isAlive).forEach((enemy) => {
+      this.apply((enemy) => {
         if (!enemy.collidesWith(position)) {
           return;
         }
@@ -68,28 +70,10 @@ export class Wave extends Array<AEnemy> implements IDrawable {
     });
     return score;
   }
-  public reset() {
-    if (this.length > 0) {
-      this.splice(0, this.length);
-    }
-    for (let y = 0; y < this.size.y; y++) {
-      for (let x = 0; x < this.size.x; x++) {
-        this.push(
-          new Crab({
-            x: x * App.TILE_SIZE,
-            y: y * App.TILE_SIZE + App.TILE_SIZE,
-          })
-        );
-      }
-    }
-    this.position.x = 0;
-    this.position.y = 0;
-    this.velocity.x = Wave.DEFAULT_SPEED;
-  }
   public getShotPositions() {
-    return this.filter((enemy) => enemy.isAlive)
+    return this.filter((enemy) => enemy?.isAlive)
       .map((enemy) => {
-        const pos = enemy.shoot();
+        const pos = enemy?.shoot();
 
         if (!pos) return;
         return {
@@ -106,7 +90,7 @@ export class Wave extends Array<AEnemy> implements IDrawable {
 
     this.position.x += this.velocity.x * delta;
     this.position.y += this.velocity.y * delta;
-    this.forEach((enemy) => enemy.update(delta));
+    this.forEach((enemy) => enemy?.update(delta));
     this.explosions.update(delta);
     if (
       this.position.x >= leftPadding &&
@@ -123,13 +107,13 @@ export class Wave extends Array<AEnemy> implements IDrawable {
   }
   public draw(ctx: CanvasRenderingContext2D) {
     ctx.translate(this.position.x, this.position.y);
-    this.filter((enemy) => enemy.isAlive).forEach((enemy) => enemy.draw(ctx));
+    this.apply((enemy) => enemy.draw(ctx));
     this.explosions.draw(ctx);
     ctx.translate(-this.position.x, -this.position.y);
   }
 
   public get areAllEnemiesDead() {
-    return this.filter((enemy) => enemy.isAlive).length === 0;
+    return this.filter((enemy) => enemy?.isAlive).length === 0;
   }
   public get hasReachedLimit() {
     const bottomY = this.position.y + this.getVerticalSize() * App.TILE_SIZE;

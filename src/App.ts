@@ -1,3 +1,4 @@
+import { EnemyPatternGenerator } from "./enemies/EnemyPatternGenerator";
 import { IDrawable } from "./IDrawable";
 import { Keyboard } from "./Keyboard";
 import { Player } from "./Player";
@@ -23,11 +24,12 @@ export class App
 	private readonly playerProjectiles: ProjectilePool = new ProjectilePool(5);
 	private readonly enemyProjectiles = new ProjectilePool(5, 1);
 	private readonly shields: Shield[] = [];
-	private readonly wave = new Wave({ x: 8, y: 3 });
+	private wave = EnemyPatternGenerator.generate(0);
 
 	private readonly gameElements: IDrawable[] = [];
 	private lastDeltaTime = 0;
 	private score = 0;
+	private currentWave = 0;
 	private isFinished = false;
 
 	constructor()
@@ -47,7 +49,6 @@ export class App
 		this.gameElements.push(this.playerProjectiles);
 		this.gameElements.push(this.enemyProjectiles);
 		this.gameElements.push(...this.shields);
-		this.gameElements.push(this.wave);
 		this.gameElements.push(this.player);
 		this.render(0);
 	}
@@ -55,7 +56,7 @@ export class App
 	private reset() {
 		this.isFinished = false;
 		this.score = 0;
-		this.wave.reset();
+		this.wave = EnemyPatternGenerator.generate(this.currentWave);
 		this.playerProjectiles.reset();
 		this.enemyProjectiles.reset();
 		this.shields.forEach((shield) => shield.reset());
@@ -64,6 +65,10 @@ export class App
 	public update(delta: number) {
 		const score = this.wave.analyseProjectiles(this.playerProjectiles);
 
+		if (this.wave.areAllEnemiesDead) {
+			this.currentWave++;
+			this.wave = EnemyPatternGenerator.generate(this.currentWave);
+		}
 		if (this.isFinished && this.keyboard.isPressed('Enter')) {
 			this.reset();
 		}
@@ -85,6 +90,13 @@ export class App
 				projectile.kill();
 			}
 		});
+		this.playerProjectiles.apply((projectile) => {
+			this.shields.filter((shield) => shield.isAlive).forEach((shield) => {
+				if (shield.collidesWith(projectile.getHitPoint())) {
+					projectile.kill();
+				}
+			});
+		});
 		this.wave.getShotPositions().forEach((position) => this.enemyProjectiles.trigger(position));
 		this.player.move(
 			this.keyboard.isPressed("ArrowLeft") ? -1 :
@@ -93,6 +105,7 @@ export class App
 		if (this.wave.hasReachedLimit)
 			this.isFinished = true;
 		this.gameElements.forEach((elem) => elem.update(delta));
+		this.wave.update(delta);
 	}
 	public render = (elapsedTime: number) => {
 		this.ctx.clearRect(0, 0, App.WIDTH, App.HEIGHT);
@@ -102,6 +115,7 @@ export class App
 				return;
 			elem.draw(this.ctx);
 		});
+		this.wave.draw(this.ctx);
 		this.ctx.font = '20px Joystick';
 		this.ctx.fillStyle = 'green';
 		this.ctx.textAlign = 'right';
