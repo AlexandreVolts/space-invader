@@ -67,6 +67,7 @@ export class App
 
 		if (this.wave.areAllEnemiesDead) {
 			this.currentWave++;
+			this.shields.forEach((shield) => shield.regenerate());
 			this.wave = EnemyPatternGenerator.generate(this.currentWave);
 		}
 		if (this.isFinished && this.keyboard.isPressed('Enter')) {

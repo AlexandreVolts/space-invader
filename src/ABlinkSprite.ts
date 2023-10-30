@@ -10,8 +10,9 @@ export class ABlinkSprite extends ASpaceInvaderSprites {
     gridPos: Readonly<Vector2>,
     animationBox: Readonly<Vector2> = { x: 0, y: 0 },
     width = 1,
+    size = 1,
   ) {
-    super(gridPos, animationBox, width);
+    super(gridPos, animationBox, width, size);
   }
 
   public blink() {

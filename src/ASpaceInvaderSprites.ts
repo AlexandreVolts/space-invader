@@ -15,14 +15,15 @@ export abstract class ASpaceInvaderSprites implements IDrawable {
     private readonly gridPos: Readonly<Vector2>,
     private readonly animationBox: Readonly<Vector2> = { x: 0, y: 0 },
     private readonly width = 1,
+    private readonly size = 1,
   ) {}
 
   public collidesWith(point: Readonly<Vector2>) {
     return (
       point.x > this.position.x &&
       point.y > this.position.y &&
-      point.x < this.position.x + App.TILE_SIZE * this.width &&
-      point.y < this.position.y + App.TILE_SIZE * 0.5
+      point.x < this.position.x + App.TILE_SIZE * this.width * this.size &&
+      point.y < this.position.y + App.TILE_SIZE * 0.5 * this.size
     );
   }
   public update(delta: number) {
@@ -39,8 +40,8 @@ export abstract class ASpaceInvaderSprites implements IDrawable {
       this.width * ASpaceInvaderSprites.TILE_WIDTH,
       ASpaceInvaderSprites.TILE_HEIGHT,
       this.position.x, this.position.y,
-      App.TILE_SIZE * this.width,
-      App.TILE_SIZE,
+      App.TILE_SIZE * this.width * this.size,
+      App.TILE_SIZE * this.size,
     )
   }
 }

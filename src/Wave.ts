@@ -38,6 +38,10 @@ export class Wave extends Array<AEnemy|null> implements IDrawable {
       selected = this[index];
       y = (y + 1) % this.size.y;
       x += y === 0 ? dir : 0;
+      if (selected?.isAlive && selected?.boss) {
+        x -= AEnemy.BOSS_SIZE * dir;
+        break;
+      }
     }
     return dir === 1 ? x : this.size.x - 1 - x;
   }
@@ -45,6 +49,9 @@ export class Wave extends Array<AEnemy|null> implements IDrawable {
     let i = this.length - 1;
 
     for (; i >= 0 && !this[i]?.isAlive; i--);
+    if (this[i]?.boss) {
+      i += this.size.x;
+    }
     return ~~(i / this.size.x) + 1;
   }
 

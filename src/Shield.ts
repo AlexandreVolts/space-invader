@@ -3,6 +3,7 @@ import { App } from "./App";
 
 export class Shield extends ABlinkSprite {
   private static readonly NB_LIVES = 8;
+  private static readonly LIVES_REGENERATION = 4;
   private static readonly NB_STATES = 4;
   private lives = Shield.NB_LIVES;
 
@@ -13,6 +14,9 @@ export class Shield extends ABlinkSprite {
   }
   public reset() {
     this.lives = Shield.NB_LIVES;
+  }
+  public regenerate() {
+    this.lives = Math.min(this.lives + Shield.LIVES_REGENERATION, Shield.NB_LIVES);
   }
   public hit() {
     this.lives--;
