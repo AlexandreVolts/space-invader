@@ -22,7 +22,7 @@ export abstract class EnemyPatternGenerator {
         output.push(
           new EnemyPatternGenerator.enemies[Math.abs(item) - 1]({
             x: j * App.TILE_SIZE,
-            y: i * App.TILE_SIZE + App.TILE_SIZE,
+            y: i * App.TILE_SIZE + App.TILE_SIZE * 2,
           }, item < 0)
         );
       }

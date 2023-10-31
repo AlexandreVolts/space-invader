@@ -5,7 +5,6 @@ import { Vector2 } from "./Vector2";
 import { AEnemy } from "./enemies/AEnemy";
 import { Pool } from "./pools/Pool";
 import { Explosion } from "./Explosion";
-import { Crab } from "./enemies/Crab";
 import { Direction } from "./Direction";
 
 export class Wave extends Array<AEnemy|null> implements IDrawable {
@@ -52,7 +51,7 @@ export class Wave extends Array<AEnemy|null> implements IDrawable {
     if (this[i]?.boss) {
       i += this.size.x;
     }
-    return ~~(i / this.size.x) + 1;
+    return ~~(i / this.size.x) + 2;
   }
 
   public analyseProjectiles(projectiles: Readonly<ProjectilePool>) {

@@ -17,9 +17,10 @@ export abstract class AEnemy extends ABlinkSprite {
       private lives = 2,
     ) {
     super(gridPos, { x: 1, y: 0 }, 1, boss ? AEnemy.BOSS_SIZE : 1);
-    if (this.boss)
+    if (this.boss) {
       this.lives *= AEnemy.BOSS_LIFE_MULTIPLIER;
-    this.score *= AEnemy.BOSS_LIFE_MULTIPLIER;
+      this.score *= AEnemy.BOSS_LIFE_MULTIPLIER;
+    }
   }
 
   public hit() {
