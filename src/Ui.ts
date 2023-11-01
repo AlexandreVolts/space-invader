@@ -4,7 +4,7 @@ import { IDrawable } from "./IDrawable";
 type UiState = "running" | "lose" | "win";
 
 export class Ui implements IDrawable {
-  private static readonly RIGHT_PADDING = 100;
+  private static readonly RIGHT_PADDING = 80;
   private static readonly DURATION = 2;
   private static readonly ANIMATION_SPEED = 8;
   public score = 0;
@@ -31,11 +31,11 @@ export class Ui implements IDrawable {
     this.bestScore = this.score;
     this.bestScoreHighlightDelay = Ui.DURATION * Ui.DURATION;
   }
-  update(delta: number) {
+  public update(delta: number) {
     this.currentWaveHighlightDelay = Math.max(0, this.currentWaveHighlightDelay - delta);
     this.bestScoreHighlightDelay = Math.max(0, this.bestScoreHighlightDelay - delta);
   }
-  draw(ctx: CanvasRenderingContext2D) {
+  public draw(ctx: CanvasRenderingContext2D) {
     ctx.font = "16px Joystick";
     ctx.fillStyle = "rgb(32, 200, 32)";
     ctx.textAlign = "right";

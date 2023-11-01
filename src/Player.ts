@@ -1,8 +1,8 @@
+import { ABlinkSprite } from "./ABlinkSprite";
 import { App } from "./App";
-import { ASpaceInvaderSprites } from "./ASpaceInvaderSprites";
 import { Vector2 } from "./Vector2";
 
-export class Player extends ASpaceInvaderSprites {
+export class Player extends ABlinkSprite  {
   private static readonly SPEED_X = 200;
   private vx = 0;
 

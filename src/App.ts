@@ -1,6 +1,7 @@
 import { EnemyPatternGenerator } from "./enemies/EnemyPatternGenerator";
 import { IDrawable } from "./IDrawable";
 import { Keyboard } from "./Keyboard";
+import { Lifebar } from "./Lifebar";
 import { Player } from "./Player";
 import { ProjectilePool } from "./pools/ProjectilePool";
 import { Shield } from "./Shield";
@@ -21,6 +22,7 @@ export class App {
 	private readonly background = new TiledBackground();
 	private readonly player = new Player();
 	private readonly ui = new Ui();
+	private readonly lifebar = new Lifebar();
 	private readonly playerProjectiles: ProjectilePool = new ProjectilePool(5);
 	private readonly enemyProjectiles = new ProjectilePool(5, 1);
 	private readonly shields: Shield[] = [];
@@ -28,6 +30,7 @@ export class App {
 
 	private readonly gameElements: IDrawable[] = [];
 	private lastDeltaTime = 0;
+	private lives = Lifebar.NB;
 
 	constructor() {
 		this.canvas = document.getElementsByTagName("canvas")[0];
@@ -52,10 +55,36 @@ export class App {
 
 	private reset() {
 		this.ui.reset();
+		this.lives = Lifebar.NB;
 		this.wave = EnemyPatternGenerator.generate(this.ui.currentWave);
 		this.playerProjectiles.reset();
 		this.enemyProjectiles.reset();
 		this.shields.forEach((shield) => shield.reset());
+	}
+	private updateProjectiles() {
+		this.enemyProjectiles.apply((projectile) => {
+			this.shields.filter((shield) => shield.isAlive).forEach((shield) => {
+				if (shield.collidesWith(projectile.getHitPoint())) {
+					shield.hit();
+					projectile.kill();
+				}
+			});
+			if (this.player.collidesWith(projectile.getHitPoint())) {
+				this.lives--;
+				projectile.kill();
+				this.player.blink();
+				if (this.lives === 0) {
+					this.ui.end("lose");
+				}
+			}
+		});
+		this.playerProjectiles.apply((projectile) => {
+			this.shields.filter((shield) => shield.isAlive).forEach((shield) => {
+				if (shield.collidesWith(projectile.getHitPoint())) {
+					projectile.kill();
+				}
+			});
+		});
 	}
 
 	public update(delta: number) {
@@ -73,32 +102,16 @@ export class App {
 			}
 		}
 		this.ui.score += this.wave.analyseProjectiles(this.playerProjectiles);
-		this.enemyProjectiles.apply((projectile) => {
-			this.shields.filter((shield) => shield.isAlive).forEach((shield) => {
-				if (shield.collidesWith(projectile.getHitPoint())) {
-					shield.hit();
-					projectile.kill();
-				}
-			});
-			if (this.player.collidesWith(projectile.getHitPoint())) {
-				projectile.kill();
-				this.ui.end("lose");
-			}
-		});
-		this.playerProjectiles.apply((projectile) => {
-			this.shields.filter((shield) => shield.isAlive).forEach((shield) => {
-				if (shield.collidesWith(projectile.getHitPoint())) {
-					projectile.kill();
-				}
-			});
-		});
+		this.updateProjectiles();
 		this.wave.getShotPositions().forEach((position) => this.enemyProjectiles.trigger(position));
 		this.player.move(
 			this.keyboard.isPressed("ArrowLeft") ? -1 :
 				this.keyboard.isPressed("ArrowRight") ? 1 : 0,
 		);
-		if (this.wave.hasReachedLimit)
+		if (this.wave.hasReachedLimit) {
+			this.lives = 0;
 			this.ui.end("lose");
+		}
 		this.gameElements.forEach((elem) => elem.update(delta));
 		this.wave.update(delta);
 	}
@@ -111,6 +124,7 @@ export class App {
 			elem.draw(this.ctx);
 		});
 		this.wave.draw(this.ctx);
+		this.lifebar.draw(this.ctx, this.lives);
 		this.lastDeltaTime = elapsedTime;
 		requestAnimationFrame(this.render);
 	}
