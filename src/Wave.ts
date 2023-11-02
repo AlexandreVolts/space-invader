@@ -13,7 +13,7 @@ export class Wave extends Array<AEnemy|null> implements IDrawable {
   private readonly position: Vector2 = { x: 0, y: 0 };
   private readonly velocity: Vector2 = { x: Wave.DEFAULT_SPEED, y: 0 };
   private readonly explosions = new Pool(
-    ...Array.from({ length: 4 }).map(() => new Explosion())
+    ...Array.from({ length: 8 }).map(() => new Explosion())
   );
 
   constructor(private readonly size: Readonly<Vector2>) {
@@ -75,6 +75,26 @@ export class Wave extends Array<AEnemy|null> implements IDrawable {
       });
     });
     return score;
+  }
+  public analyseLaser(x: number) {
+    let score = 0;
+
+    this.apply((enemy) => {
+      const position = {
+        x: enemy.getPosition().x + this.position.x,
+        y: enemy.getPosition().y + this.position.y,
+      };
+
+      if (x < position.x || x > position.x + App.TILE_SIZE) {
+        return;
+      }
+      enemy.hit();
+      if (!enemy.isAlive) {
+        score += enemy.score;
+        this.explosions.trigger(position);
+      }
+    });
+    return (score);
   }
   public getShotPositions() {
     return this.filter((enemy) => enemy?.isAlive)

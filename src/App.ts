@@ -1,6 +1,7 @@
 import { EnemyPatternGenerator } from "./enemies/EnemyPatternGenerator";
 import { IDrawable } from "./IDrawable";
 import { Keyboard } from "./Keyboard";
+import { Laser } from "./Laser";
 import { Lifebar } from "./Lifebar";
 import { Player } from "./Player";
 import { ProjectilePool } from "./pools/ProjectilePool";
@@ -26,6 +27,7 @@ export class App {
 	private readonly playerProjectiles: ProjectilePool = new ProjectilePool(5);
 	private readonly enemyProjectiles = new ProjectilePool(5, 1);
 	private readonly shields: Shield[] = [];
+	private readonly laser = new Laser();
 	private wave = EnemyPatternGenerator.generate(0);
 
 	private readonly gameElements: IDrawable[] = [];
@@ -60,6 +62,7 @@ export class App {
 		this.playerProjectiles.reset();
 		this.enemyProjectiles.reset();
 		this.shields.forEach((shield) => shield.reset());
+		this.laser.reset();
 	}
 	private updateProjectiles() {
 		this.enemyProjectiles.apply((projectile) => {
@@ -88,6 +91,11 @@ export class App {
 	}
 
 	public update(delta: number) {
+		let score = this.wave.analyseProjectiles(this.playerProjectiles);
+	
+		if (this.laser.isActive) {
+			score += this.wave.analyseLaser(this.player.getPosition().x + App.TILE_SIZE / 2);
+		}
 		if (this.wave.areAllEnemiesDead) {
 			this.ui.incrementWave();
 			this.shields.forEach((shield) => shield.regenerate());
@@ -98,22 +106,30 @@ export class App {
 		}
 		if (this.ui.state == "running") {
 			if (this.keyboard.isPressed("ArrowUp") || this.keyboard.isPressed("Space")) {
-				this.playerProjectiles.trigger(this.player.getPosition());
+				if (!this.laser.isActive)
+					this.playerProjectiles.trigger(this.player.getPosition());
+			}
+			if (this.keyboard.isPressed("ArrowDown")) {
+				this.laser.trigger();
 			}
 		}
-		this.ui.score += this.wave.analyseProjectiles(this.playerProjectiles);
+		this.ui.score += score;
+		if (score !== 0 && !this.laser.isActive) {
+			this.laser.load();
+		}
 		this.updateProjectiles();
 		this.wave.getShotPositions().forEach((position) => this.enemyProjectiles.trigger(position));
 		this.player.move(
 			this.keyboard.isPressed("ArrowLeft") ? -1 :
 				this.keyboard.isPressed("ArrowRight") ? 1 : 0,
 		);
-		if (this.wave.hasReachedLimit) {
+		if (this.ui.state === "running" && this.wave.hasReachedLimit) {
 			this.lives = 0;
 			this.ui.end("lose");
 		}
-		this.gameElements.forEach((elem) => elem.update(delta));
 		this.wave.update(delta);
+		this.laser.update(delta);
+		this.gameElements.forEach((elem) => elem.update(delta));
 	}
 	public render = (elapsedTime: number) => {
 		this.ctx.clearRect(0, 0, App.WIDTH, App.HEIGHT);
@@ -124,6 +140,7 @@ export class App {
 			elem.draw(this.ctx);
 		});
 		this.wave.draw(this.ctx);
+		this.laser.draw(this.ctx, this.player.getPosition());
 		this.lifebar.draw(this.ctx, this.lives);
 		this.lastDeltaTime = elapsedTime;
 		requestAnimationFrame(this.render);

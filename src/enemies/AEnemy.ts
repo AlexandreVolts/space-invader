@@ -41,6 +41,9 @@ export abstract class AEnemy extends ABlinkSprite {
     super.update(delta);
     this.cooldown -= delta;
   }
+  public getPosition() {
+    return ({ ...this.position });
+  }
 
   public get isAlive() {
     return (this.lives > 0);

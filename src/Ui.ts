@@ -8,7 +8,7 @@ export class Ui implements IDrawable {
   private static readonly DURATION = 2;
   private static readonly ANIMATION_SPEED = 8;
   public score = 0;
-  private bestScore = parseInt(localStorage.getItem("score")!);
+  private bestScore = parseInt(localStorage.getItem("score") || "0");
   private currentWaveHighlightDelay = 0;
   private bestScoreHighlightDelay = 0;
   private _state: UiState = "running";
