@@ -28,7 +28,7 @@ export class Laser {
     ctx.font = "16px Joystick";
     ctx.textAlign = "left";
     ctx.fillText("Laser", 110, 10);
-    this.progress.draw(ctx, this.loader / Laser.LOAD_SIZE, { x: 110, y: 25 });
+    this.progress.draw(ctx, Math.min(1, this.loader / Laser.LOAD_SIZE), { x: 110, y: 25 });
     if (!this.isActive)
       return;
     ctx.lineWidth = 3;

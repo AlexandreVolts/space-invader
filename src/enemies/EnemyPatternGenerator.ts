@@ -1,11 +1,12 @@
 import { Crab } from "./Crab";
 import { Crane } from "./Crane";
+import { Squid } from "./Squid";
 import { Wave } from "../Wave";
 import { App } from "../App";
 import json from "./../json/waves.json";
 
 export abstract class EnemyPatternGenerator {
-  private static readonly enemies = [Crab, Crane];
+  private static readonly enemies = [Crab, Crane, Squid];
 
   public static generate(id: number): Wave {
     const pattern = json.data[id].data;

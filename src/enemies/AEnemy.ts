@@ -8,7 +8,7 @@ export abstract class AEnemy extends ABlinkSprite {
   private static readonly MIN_COOLDOWN = 2.5;
   private static readonly MAX_COOLDOWN = 20;
   private static readonly BOSS_LIFE_MULTIPLIER = 6;
-  private cooldown = rand(AEnemy.MIN_COOLDOWN, AEnemy.MAX_COOLDOWN);
+  protected cooldown = rand(AEnemy.MIN_COOLDOWN, AEnemy.MAX_COOLDOWN);
 
   constructor(
       gridPos: Readonly<Vector2>,

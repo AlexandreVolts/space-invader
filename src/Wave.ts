@@ -7,7 +7,7 @@ import { Pool } from "./pools/Pool";
 import { Explosion } from "./Explosion";
 import { Direction } from "./Direction";
 
-export class Wave extends Array<AEnemy|null> implements IDrawable {
+export class Wave extends Array<AEnemy | null> implements IDrawable {
   private static readonly DEFAULT_SPEED = 20;
   private static readonly SPEED_ACCELERATION = 1.15;
   private readonly position: Vector2 = { x: 0, y: 0 };
@@ -29,17 +29,19 @@ export class Wave extends Array<AEnemy|null> implements IDrawable {
     let index = x + y * this.size.x;
     let selected = this[index];
 
-    for (
-      ;
-      !selected?.isAlive && index >= 0 && index < this.size.x * this.size.y;
-      index = x + y * this.size.x
+    while (
+      !selected?.isAlive &&
+      index >= 0 &&
+      index < this.size.x * this.size.y
     ) {
-      selected = this[index];
       y = (y + 1) % this.size.y;
       x += y === 0 ? dir : 0;
-      if (selected?.isAlive && selected?.boss) {
-        x -= AEnemy.BOSS_SIZE * dir;
-        break;
+      index = x + y * this.size.x;
+      selected = this[index];
+    }
+    if (selected?.boss) {
+      if (dir === -1) {
+        x += AEnemy.BOSS_SIZE - 1;
       }
     }
     return dir === 1 ? x : this.size.x - 1 - x;
@@ -94,7 +96,7 @@ export class Wave extends Array<AEnemy|null> implements IDrawable {
         this.explosions.trigger(position);
       }
     });
-    return (score);
+    return score;
   }
   public getShotPositions() {
     return this.filter((enemy) => enemy?.isAlive)
