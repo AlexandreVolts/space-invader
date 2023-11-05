@@ -6,15 +6,18 @@ import { AEnemy } from "./enemies/AEnemy";
 import { Pool } from "./pools/Pool";
 import { Explosion } from "./Explosion";
 import { Direction } from "./Direction";
+import { Mothership } from "./enemies/Mothership";
 
 export class Wave extends Array<AEnemy | null> implements IDrawable {
   private static readonly DEFAULT_SPEED = 20;
   private static readonly SPEED_ACCELERATION = 1.15;
+  private static readonly MOTHERSHIP_DAMAGE_RATIO = 0.5;
   private readonly position: Vector2 = { x: 0, y: 0 };
   private readonly velocity: Vector2 = { x: Wave.DEFAULT_SPEED, y: 0 };
   private readonly explosions = new Pool(
-    ...Array.from({ length: 8 }).map(() => new Explosion())
+    ...Array.from({ length: 16 }).map(() => new Explosion())
   );
+  private readonly mothership = new Mothership();
 
   constructor(private readonly size: Readonly<Vector2>) {
     super();
@@ -53,7 +56,22 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
     if (this[i]?.boss) {
       i += this.size.x;
     }
-    return ~~(i / this.size.x) + 2;
+    return ~~(i / this.size.x) + 1;
+  }
+  private killRandomEnemies() {
+    let score = 0;
+
+    this.apply((enemy) => {
+      if (Math.random() > Wave.MOTHERSHIP_DAMAGE_RATIO) {
+        return;
+      }
+      while (enemy?.isAlive) {
+        enemy.hit();
+      }
+      this.explosions.trigger(enemy.getPosition());
+      score += enemy?.score;
+    });
+    return score;
   }
 
   public analyseProjectiles(projectiles: Readonly<ProjectilePool>) {
@@ -64,6 +82,15 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
         x: projectile.getHitPoint().x - this.position.x,
         y: projectile.getHitPoint().y - this.position.y,
       };
+
+      if (
+        this.mothership.isAlive &&
+        this.mothership.collidesWith(projectile.getHitPoint())
+      ) {
+        score += this.killRandomEnemies();
+        this.mothership.kill();
+        projectile.kill();
+      }
       this.apply((enemy) => {
         if (!enemy.collidesWith(position)) {
           return;
@@ -119,6 +146,7 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
     this.position.x += this.velocity.x * delta;
     this.position.y += this.velocity.y * delta;
     this.forEach((enemy) => enemy?.update(delta));
+    this.mothership.update(delta);
     this.explosions.update(delta);
     if (
       this.position.x >= leftPadding &&
@@ -138,6 +166,7 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
     this.apply((enemy) => enemy.draw(ctx));
     this.explosions.draw(ctx);
     ctx.translate(-this.position.x, -this.position.y);
+    this.mothership.draw(ctx);
   }
 
   public get areAllEnemiesDead() {

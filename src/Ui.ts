@@ -15,7 +15,7 @@ export class Ui implements IDrawable {
   private _currentWave = 0;
 
   public reset() {
-		this.score = 0;
+    this.score = 0;
     this._state = "running";
     this._currentWave = 0;
   }
@@ -25,15 +25,18 @@ export class Ui implements IDrawable {
   }
   public end(state: UiState) {
     this._state = state;
-    if (!isNaN(this.bestScore) && this.bestScore > this.score)
-      return;
+    if (this.bestScore >= this.score) return;
     localStorage.setItem("score", `${this.score}`);
     this.bestScore = this.score;
     this.bestScoreHighlightDelay = Ui.DURATION * Ui.DURATION;
   }
   public update(delta: number) {
-    this.currentWaveHighlightDelay = Math.max(0, this.currentWaveHighlightDelay - delta);
-    this.bestScoreHighlightDelay = Math.max(0, this.bestScoreHighlightDelay - delta);
+    this.currentWaveHighlightDelay = Math.max(
+      0, this.currentWaveHighlightDelay - delta
+    );
+    this.bestScoreHighlightDelay = Math.max(
+      0, this.bestScoreHighlightDelay - delta
+    );
   }
   public draw(ctx: CanvasRenderingContext2D) {
     ctx.font = "16px Joystick";
@@ -48,23 +51,27 @@ export class Ui implements IDrawable {
     ctx.fillStyle = "rgb(32, 200, 32)";
     ctx.font = `${16 + Math.sin(this.bestScoreHighlightDelay * Ui.ANIMATION_SPEED)}px Joystick`;
     ctx.fillText("Highscore: ", App.WIDTH - Ui.RIGHT_PADDING, 30);
-    ctx.fillText(`${this.bestScore * App.SCORE_MULTIPLIER}`, App.WIDTH - 10, 30);
+    ctx.fillText(
+      `${this.bestScore * App.SCORE_MULTIPLIER}`,
+      App.WIDTH - 10,
+      30
+    );
     ctx.font = `${16 + Math.sin(this.currentWaveHighlightDelay * Ui.ANIMATION_SPEED)}px Joystick`;
     ctx.fillText("Wave: ", App.WIDTH - Ui.RIGHT_PADDING, 50);
     ctx.fillText(`${this._currentWave + 1}`, App.WIDTH - 10, 50);
-    if (this.state !== "running") {
-			ctx.font = '40px Joystick';
-			ctx.textAlign = 'center';
-			ctx.fillText('Game over', App.WIDTH * 0.5, App.HEIGHT * 0.3);
-			ctx.font = '15px Joystick';
-			ctx.fillText('Press Enter to restart', App.WIDTH * 0.5, App.HEIGHT * 0.5);
-		}
+    if (this.state === "running")
+      return;
+    ctx.font = "40px Joystick";
+    ctx.textAlign = "center";
+    ctx.fillText("Game over", App.WIDTH * 0.5, App.HEIGHT * 0.3);
+    ctx.font = "15px Joystick";
+    ctx.fillText("Press Enter to restart", App.WIDTH * 0.5, App.HEIGHT * 0.5);
   }
 
   public get currentWave() {
-    return (this._currentWave);
+    return this._currentWave;
   }
   public get state() {
-    return (this._state);
+    return this._state;
   }
 }

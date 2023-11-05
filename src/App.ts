@@ -12,7 +12,7 @@ import { Ui } from "./Ui";
 export class App {
 	private static readonly GAME_SIZE_COEFF = 0.6;
 	private static readonly NB_SHIELDS = 4;
-	public static readonly TILE_SIZE = 40;
+	public static readonly TILE_SIZE = 35;
 	public static readonly WIDTH = 720 * App.GAME_SIZE_COEFF;
 	public static readonly HEIGHT = 1280 * App.GAME_SIZE_COEFF;
 	public static readonly SCORE_MULTIPLIER = 100;

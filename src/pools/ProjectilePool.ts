@@ -4,7 +4,7 @@ import { Vector2 } from "../Vector2";
 import { Pool } from "./Pool";
 
 export class ProjectilePool extends Pool<Projectile> {
-  private static readonly COOLDOWN = 0.4;
+  private static readonly COOLDOWN = 0.5;
   private cooldown = 0;
 
   constructor(size: number, dir: Direction = -1) {
