@@ -3,10 +3,10 @@ import { IDrawable } from "./IDrawable";
 import { ProjectilePool } from "./pools/ProjectilePool";
 import { Vector2 } from "./Vector2";
 import { AEnemy } from "./enemies/AEnemy";
-import { Pool } from "./pools/Pool";
-import { Explosion } from "./Explosion";
 import { Direction } from "./Direction";
 import { Mothership } from "./enemies/Mothership";
+
+type OnEnemyKilledCallback = (position: Vector2) => void;
 
 export class Wave extends Array<AEnemy | null> implements IDrawable {
   private static readonly DEFAULT_SPEED = 20;
@@ -14,9 +14,6 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
   private static readonly MOTHERSHIP_DAMAGE_RATIO = 0.5;
   private readonly position: Vector2 = { x: 0, y: 0 };
   private readonly velocity: Vector2 = { x: Wave.DEFAULT_SPEED, y: 0 };
-  private readonly explosions = new Pool(
-    ...Array.from({ length: 16 }).map(() => new Explosion())
-  );
   private readonly mothership = new Mothership();
 
   constructor(private readonly size: Readonly<Vector2>) {
@@ -58,7 +55,7 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
     }
     return ~~(i / this.size.x) + 1;
   }
-  private killRandomEnemies() {
+  private killRandomEnemies(onEnemyKilled: OnEnemyKilledCallback) {
     let score = 0;
 
     this.apply((enemy) => {
@@ -68,13 +65,13 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
       while (enemy?.isAlive) {
         enemy.hit();
       }
-      this.explosions.trigger(enemy.getPosition());
+      onEnemyKilled(enemy.getPosition());
       score += enemy?.score;
     });
     return score;
   }
 
-  public analyseProjectiles(projectiles: Readonly<ProjectilePool>) {
+  public analyseProjectiles(projectiles: Readonly<ProjectilePool>, onEnemyKilled: OnEnemyKilledCallback) {
     let score = 0;
 
     projectiles.apply((projectile) => {
@@ -87,7 +84,7 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
         this.mothership.isAlive &&
         this.mothership.collidesWith(projectile.getHitPoint())
       ) {
-        score += this.killRandomEnemies();
+        score += this.killRandomEnemies(onEnemyKilled);
         this.mothership.kill();
         projectile.kill();
       }
@@ -99,13 +96,13 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
         projectile.kill();
         if (!enemy.isAlive) {
           score += enemy.score;
-          this.explosions.trigger(position);
+          onEnemyKilled(projectile.getHitPoint());
         }
       });
     });
     return score;
   }
-  public analyseLaser(x: number) {
+  public analyseLaser(x: number, onEnemyKilled: OnEnemyKilledCallback) {
     let score = 0;
 
     this.apply((enemy) => {
@@ -120,7 +117,7 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
       enemy.hit();
       if (!enemy.isAlive) {
         score += enemy.score;
-        this.explosions.trigger(position);
+        onEnemyKilled(position);
       }
     });
     return score;
@@ -147,7 +144,6 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
     this.position.y += this.velocity.y * delta;
     this.forEach((enemy) => enemy?.update(delta));
     this.mothership.update(delta);
-    this.explosions.update(delta);
     if (
       this.position.x >= leftPadding &&
       this.position.x + this.size.x * App.TILE_SIZE <= rightPadding
@@ -164,7 +160,6 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
   public draw(ctx: CanvasRenderingContext2D) {
     ctx.translate(this.position.x, this.position.y);
     this.apply((enemy) => enemy.draw(ctx));
-    this.explosions.draw(ctx);
     ctx.translate(-this.position.x, -this.position.y);
     this.mothership.draw(ctx);
   }

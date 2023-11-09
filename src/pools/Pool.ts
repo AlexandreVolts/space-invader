@@ -4,9 +4,9 @@ import { IPooledObject } from "./IPooledObject";
 
 export class Pool<T extends IPooledObject> extends Array<T> implements IDrawable {
   public trigger(position: Readonly<Vector2>) {
-    this.find((item) => !item.isAlive)?.trigger(position);
+    super.find((item) => !item.isAlive)?.trigger(position);
   }
-  public apply = (callback: (item: T) => void) => this.filter((item) => item.isAlive).forEach(callback);
+  public apply = (callback: (item: T) => void) => super.filter((item) => item.isAlive).forEach(callback);
 
   public update(delta: number) {
     this.apply((item) => item.update(delta));

@@ -3,7 +3,7 @@ import { ProgressBar } from "./ProgressBar";
 import { Vector2 } from "./Vector2";
 
 export class Laser {
-  private static readonly LOAD_SIZE = 20;
+  private static readonly LOAD_SIZE = 5;
   private static readonly DURATION = 0.8;
   private progress = new ProgressBar();
   private loader = 0;

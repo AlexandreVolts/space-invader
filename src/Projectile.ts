@@ -26,13 +26,13 @@ export class Projectile extends ASpaceInvaderSprites implements IPooledObject {
       this.kill();
     }
   }
-
   public getHitPoint() {
     return ({
       x: this.position.x + App.TILE_SIZE * 0.5,
       y: this.position.y,
     });
   }
+
   public get isAlive() {
     return (!this.free);
   }
