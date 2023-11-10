@@ -15,7 +15,7 @@ import { Bonus } from "./Bonus";
 
 export class App {
 	private static readonly GAME_SIZE_COEFF = 0.6;
-	private static readonly BONUS_COEF = 0.1;
+	private static readonly BONUS_COEF = 0.15;
 	private static readonly NB_SHIELDS = 4;
 	public static readonly TILE_SIZE = 35;
 	public static readonly WIDTH = 720 * App.GAME_SIZE_COEFF;
@@ -43,7 +43,7 @@ export class App {
 	private readonly player = new Player();
 	private readonly shields: Shield[] = [];
 	private readonly laser = new Laser();
-	private wave = EnemyPatternGenerator.generate(0);
+	private wave = EnemyPatternGenerator.generate(0)!;
 
 	private readonly gameElements: IDrawable[] = [];
 	private lastDeltaTime = 0;
@@ -73,9 +73,15 @@ export class App {
 	}
 
 	private reset() {
+		const wave = EnemyPatternGenerator.generate(this.ui.currentWave);
+
+		if (!wave) {
+			this.ui.end("win");
+			return;
+		}
 		this.ui.reset();
 		this.lives = Lifebar.NB;
-		this.wave = EnemyPatternGenerator.generate(this.ui.currentWave);
+		this.wave = wave;
 		this.playerProjectiles.reset();
 		this.enemyProjectiles.reset();
 		this.shields.forEach((shield) => shield.reset());
@@ -135,6 +141,8 @@ export class App {
 			}
 			this.explosions.trigger({ x: bonus.position.x, y: bonus.position.y + App.TILE_SIZE * 0.5 });
 			bonus.kill();
+			this.bonuses.unshift(this.bonuses[this.bonuses.length - 1]);
+			this.bonuses.pop();
 		});
 	}
 
@@ -150,10 +158,17 @@ export class App {
 				this.onEnemyKilled
 			);
 		}
-		if (this.wave.areAllEnemiesDead) {
+		if (this.ui.state === "running" && this.wave.areAllEnemiesDead) {
 			this.ui.incrementWave();
 			this.shields.forEach((shield) => shield.regenerate());
-			this.wave = EnemyPatternGenerator.generate(this.ui.currentWave);
+
+			const wave = EnemyPatternGenerator.generate(this.ui.currentWave);
+			if (!wave) {
+				this.ui.end("win");
+			}
+			else {
+				this.wave = wave;
+			}
 		}
 		if (this.ui.state !== "running" && this.keyboard.isPressed("Enter")) {
 			this.reset();

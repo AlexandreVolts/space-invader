@@ -8,10 +8,12 @@ import json from "./../json/waves.json";
 export abstract class EnemyPatternGenerator {
   private static readonly enemies = [Crab, Crane, Squid];
 
-  public static generate(id: number): Wave {
-    const pattern = json.data[id].data;
-    const output = new Wave({ x: pattern[0].length, y: pattern.length });
+  public static generate(id: number): Wave | undefined {
+    const pattern = json.data[id]?.data;
+    const output = new Wave({ x: pattern?.[0]?.length, y: pattern?.length });
 
+    if (!pattern)
+      return (undefined);
     for (let i = 0, w = pattern.length; i < w; i++) {
       for (let j = 0, h = pattern[0].length; j < h; j++) {
         const item = pattern[i][j];

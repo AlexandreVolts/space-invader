@@ -5,6 +5,6 @@ export class Lifebar extends ProgressBar {
     ctx.font = "16px Joystick";
     ctx.textAlign = "left";
     ctx.fillText("Health", 10, 10);
-    super.draw(ctx, lives / Lifebar.NB, { x: 10, y: 25 });
+    super.draw(ctx, Math.max(0, lives / Lifebar.NB), { x: 10, y: 25 });
   }
 }

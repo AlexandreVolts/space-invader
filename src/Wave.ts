@@ -59,13 +59,18 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
     let score = 0;
 
     this.apply((enemy) => {
+      const position = {
+        x: enemy.getPosition().x + this.position.x,
+        y: enemy.getPosition().y + this.position.y,
+      };
+
       if (Math.random() > Wave.MOTHERSHIP_DAMAGE_RATIO) {
         return;
       }
       while (enemy?.isAlive) {
         enemy.hit();
       }
-      onEnemyKilled(enemy.getPosition());
+      onEnemyKilled(position);
       score += enemy?.score;
     });
     return score;

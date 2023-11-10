@@ -42,7 +42,7 @@ export class Bonus implements IPooledObject, IDrawable {
   public draw(ctx: CanvasRenderingContext2D): void {
     ctx.drawImage(
       Bonus.IMAGE,
-      0,
+      Math.floor(this._position.y / 100) % 2 === 0 ? Bonus.TILE_WIDTH : 0,
       (this.imageY + 1) * Bonus.TILE_HEIGHT,
       Bonus.TILE_WIDTH,
       Bonus.TILE_HEIGHT,

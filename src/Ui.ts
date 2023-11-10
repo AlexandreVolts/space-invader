@@ -61,9 +61,11 @@ export class Ui implements IDrawable {
     ctx.fillText(`${this._currentWave + 1}`, App.WIDTH - 10, 50);
     if (this.state === "running")
       return;
-    ctx.font = "40px Joystick";
+    ctx.font = "30px Joystick";
     ctx.textAlign = "center";
-    ctx.fillText("Game over", App.WIDTH * 0.5, App.HEIGHT * 0.3);
+    ctx.fillText(this.state === "win" ? "Congratulations!" : "Game over", App.WIDTH * 0.5, App.HEIGHT * 0.3);
+    ctx.font = `${16 + Math.sin(this.bestScoreHighlightDelay) * Ui.ANIMATION_SPEED}px Joystick`;
+    ctx.fillText(`Score: ${this.score * 100}`, App.WIDTH * 0.5, App.HEIGHT * 0.4);
     ctx.font = "15px Joystick";
     ctx.fillText("Press Enter to restart", App.WIDTH * 0.5, App.HEIGHT * 0.5);
   }
