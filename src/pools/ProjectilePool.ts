@@ -1,5 +1,6 @@
 import { Direction } from "../Direction";
 import { Projectile } from "../Projectile";
+import { SoundManager } from "../SoundManager";
 import { Vector2 } from "../Vector2";
 import { Pool } from "./Pool";
 
@@ -17,6 +18,7 @@ export class ProjectilePool extends Pool<Projectile> {
   public trigger(position: Readonly<Vector2>) {
     if (this.cooldown > 0)
 			return;
+    SoundManager.play("player-laser");
     this.cooldown = ProjectilePool.COOLDOWN;
 		super.trigger(position);
   }

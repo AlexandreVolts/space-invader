@@ -12,6 +12,7 @@ import { Ui } from "./Ui";
 import { Explosion } from "./Explosion";
 import { Vector2 } from "./Vector2";
 import { Bonus } from "./Bonus";
+import { SoundManager } from "./SoundManager";
 
 export class App {
 	private static readonly GAME_SIZE_COEFF = 0.6;
@@ -100,6 +101,7 @@ export class App {
 				.filter((shield) => shield.isAlive)
 				.forEach((shield) => {
 					if (shield.collidesWith(projectile.getHitPoint())) {
+						SoundManager.play("shield-hit");
 						shield.hit();
 						projectile.kill();
 					}
@@ -141,6 +143,7 @@ export class App {
 			}
 			this.explosions.trigger({ x: bonus.position.x, y: bonus.position.y + App.TILE_SIZE * 0.5 });
 			bonus.kill();
+			SoundManager.play("bonus");
 			this.bonuses.unshift(this.bonuses[this.bonuses.length - 1]);
 			this.bonuses.pop();
 		});
@@ -178,8 +181,9 @@ export class App {
 				this.keyboard.isPressed("ArrowUp") ||
 				this.keyboard.isPressed("Space")
 			) {
-				if (!this.laser.isActive)
+				if (!this.laser.isActive) {
 					this.playerProjectiles.trigger(this.player.getPosition());
+				}
 			}
 			if (this.keyboard.isPressed("ArrowDown")) {
 				this.laser.trigger();
