@@ -1,5 +1,6 @@
 import { ASpaceInvaderSprites } from "../ASpaceInvaderSprites";
 import { App } from "../App";
+import { SoundManager } from "../SoundManager";
 import { rand } from "../rand";
 
 export class Mothership extends ASpaceInvaderSprites {
@@ -18,10 +19,12 @@ export class Mothership extends ASpaceInvaderSprites {
 
   public kill() {
     this.alive = false;
+    SoundManager.play("mothership-hit");
   }
   public update(delta: number) {
     this.delay -= delta;
     if (this.delay > 0) return;
+    if (this.delay >= -delta) SoundManager.play("mothership");
     this.position.x += Mothership.SPEED * delta;
     this.position.y += this.vy;
     if (!this.isAlive) {

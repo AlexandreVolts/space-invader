@@ -74,12 +74,8 @@ export class App {
 	}
 
 	private reset() {
-		const wave = EnemyPatternGenerator.generate(this.ui.currentWave);
+		const wave = EnemyPatternGenerator.generate(0)!;
 
-		if (!wave) {
-			this.ui.end("win");
-			return;
-		}
 		this.ui.reset();
 		this.lives = Lifebar.NB;
 		this.wave = wave;
@@ -87,6 +83,7 @@ export class App {
 		this.enemyProjectiles.reset();
 		this.shields.forEach((shield) => shield.reset());
 		this.laser.reset();
+		SoundManager.play("restart");
 	}
 	private onEnemyKilled = (position: Vector2) => {
 		const pos = { x: position.x - App.TILE_SIZE * 0.2, y: position.y };
@@ -94,6 +91,7 @@ export class App {
 		this.explosions.trigger(position);
 		if (Math.random() < App.BONUS_COEF)
 			this.bonuses.trigger(pos);
+		SoundManager.play("explosion");
 	};
 	private updateProjectiles() {
 		this.enemyProjectiles.apply((projectile) => {
@@ -110,6 +108,7 @@ export class App {
 				this.lives--;
 				projectile.kill();
 				this.player.blink();
+				SoundManager.play("player-hit");
 				if (this.lives === 0) {
 					this.ui.end("lose");
 				}
@@ -133,6 +132,7 @@ export class App {
 			switch (bonus.type) {
 				case "H":
 					this.lives = Math.min(Lifebar.NB, this.lives + 1);
+					SoundManager.play("health-bonus");
 					break;
 				case "L":
 					this.laser.load();

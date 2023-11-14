@@ -1,5 +1,6 @@
 import { App } from "./App";
 import { IDrawable } from "./IDrawable";
+import { SoundManager } from "./SoundManager";
 
 type UiState = "running" | "lose" | "win";
 
@@ -29,6 +30,7 @@ export class Ui implements IDrawable {
     localStorage.setItem("score", `${this.score}`);
     this.bestScore = this.score;
     this.bestScoreHighlightDelay = Ui.DURATION * Ui.DURATION;
+    SoundManager.play("gameover");
   }
   public update(delta: number) {
     this.currentWaveHighlightDelay = Math.max(

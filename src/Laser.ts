@@ -1,5 +1,6 @@
 import { App } from "./App";
 import { ProgressBar } from "./ProgressBar";
+import { SoundManager } from "./SoundManager";
 import { Vector2 } from "./Vector2";
 
 export class Laser {
@@ -14,12 +15,15 @@ export class Laser {
   }
   public load() {
     this.loader++;
+    if (this.loader === Laser.LOAD_SIZE)
+      SoundManager.play("laser-ready");
   }
   public trigger() {
     if (this.loader < Laser.LOAD_SIZE)
       return;
     this.duration = Laser.DURATION;
     this.loader = 0;
+    SoundManager.play("laser");
   }
   public update(delta: number): void {
     this.duration -= delta;
