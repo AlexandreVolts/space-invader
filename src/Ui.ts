@@ -2,7 +2,7 @@ import { App } from "./App";
 import { IDrawable } from "./IDrawable";
 import { SoundManager } from "./SoundManager";
 
-type UiState = "running" | "lose" | "win";
+type UiState = "menu" | "running" | "lose" | "win";
 
 export class Ui implements IDrawable {
   private static readonly RIGHT_PADDING = 80;
@@ -12,8 +12,29 @@ export class Ui implements IDrawable {
   private bestScore = parseInt(localStorage.getItem("score") || "0");
   private currentWaveHighlightDelay = 0;
   private bestScoreHighlightDelay = 0;
-  private _state: UiState = "running";
+  private _state: UiState = "menu";
   private _currentWave = 0;
+
+  private drawGameover(ctx: CanvasRenderingContext2D) {
+    ctx.font = "30px Joystick";
+    ctx.textAlign = "center";
+    ctx.fillText(this.state === "win" ? "Congratulations!" : "Game over", App.WIDTH * 0.5, App.HEIGHT * 0.3);
+    ctx.font = `${16 + Math.sin(this.bestScoreHighlightDelay) * Ui.ANIMATION_SPEED}px Joystick`;
+    ctx.fillText(`Score: ${this.score * 100}`, App.WIDTH * 0.5, App.HEIGHT * 0.4);
+    ctx.font = "16px Joystick";
+    ctx.fillText("Press Enter to restart", App.WIDTH * 0.5, App.HEIGHT * 0.5);
+  }
+  private drawMenu(ctx: CanvasRenderingContext2D) {
+    ctx.font = "30px Joystick";
+    ctx.textAlign = "center";
+    ctx.fillText("Space Invader", App.WIDTH * 0.5, App.HEIGHT * 0.3);
+    if (this.bestScore !== 0) {
+      ctx.font = "16px Joystick";
+      ctx.fillText(`Best Score: ${this.bestScore * 100}`, App.WIDTH * 0.5, App.HEIGHT * 0.4);
+    }
+    ctx.font = "16px Joystick";
+    ctx.fillText("Press Enter to start", App.WIDTH * 0.5, App.HEIGHT * 0.5);
+  }
 
   public reset() {
     this.score = 0;
@@ -45,6 +66,10 @@ export class Ui implements IDrawable {
     ctx.fillStyle = "rgb(32, 200, 32)";
     ctx.textAlign = "right";
     ctx.textBaseline = "top";
+    if (this.state === "menu") {
+      this.drawMenu(ctx);
+      return;
+    }
     if (this.score > this.bestScore) {
       ctx.fillStyle = "rgb(32, 255, 32)";
     }
@@ -61,15 +86,9 @@ export class Ui implements IDrawable {
     ctx.font = `${16 + Math.sin(this.currentWaveHighlightDelay * Ui.ANIMATION_SPEED)}px Joystick`;
     ctx.fillText("Wave: ", App.WIDTH - Ui.RIGHT_PADDING, 50);
     ctx.fillText(`${this._currentWave + 1}`, App.WIDTH - 10, 50);
-    if (this.state === "running")
-      return;
-    ctx.font = "30px Joystick";
-    ctx.textAlign = "center";
-    ctx.fillText(this.state === "win" ? "Congratulations!" : "Game over", App.WIDTH * 0.5, App.HEIGHT * 0.3);
-    ctx.font = `${16 + Math.sin(this.bestScoreHighlightDelay) * Ui.ANIMATION_SPEED}px Joystick`;
-    ctx.fillText(`Score: ${this.score * 100}`, App.WIDTH * 0.5, App.HEIGHT * 0.4);
-    ctx.font = "15px Joystick";
-    ctx.fillText("Press Enter to restart", App.WIDTH * 0.5, App.HEIGHT * 0.5);
+    if (this.state === "lose" || this.state === "win") {
+      this.drawGameover(ctx);
+    }
   }
 
   public get currentWave() {

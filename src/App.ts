@@ -84,6 +84,7 @@ export class App {
 		this.shields.forEach((shield) => shield.reset());
 		this.laser.reset();
 		SoundManager.play("restart");
+		SoundManager.play("theme", 1);
 	}
 	private onEnemyKilled = (position: Vector2) => {
 		const pos = { x: position.x - App.TILE_SIZE * 0.2, y: position.y };
@@ -206,7 +207,9 @@ export class App {
 			this.lives = 0;
 			this.ui.end("lose");
 		}
-		this.wave.update(delta);
+		if (this.ui.state !== "menu") {
+			this.wave.update(delta);
+		}
 		this.laser.update(delta);
 		this.gameElements.forEach((elem) => elem.update(delta));
 	}
@@ -217,7 +220,9 @@ export class App {
 			if (this.ui.state !== "running" && elem instanceof Player) return;
 			elem.draw(this.ctx);
 		});
-		this.wave.draw(this.ctx);
+		if (this.ui.state !== "menu") {
+			this.wave.draw(this.ctx);
+		}
 		this.laser.draw(this.ctx, this.player.getPosition());
 		this.lifebar.draw(this.ctx, this.lives);
 		this.lastDeltaTime = elapsedTime;

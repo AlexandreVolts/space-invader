@@ -11,7 +11,7 @@ type OnEnemyKilledCallback = (position: Vector2) => void;
 export class Wave extends Array<AEnemy | null> implements IDrawable {
   private static readonly DEFAULT_SPEED = 20;
   private static readonly SPEED_ACCELERATION = 1.15;
-  private static readonly MOTHERSHIP_DAMAGE_RATIO = 0.5;
+  private static readonly MOTHERSHIP_DAMAGE_RATIO = 0.4;
   private readonly position: Vector2 = { x: 0, y: 0 };
   private readonly velocity: Vector2 = { x: Wave.DEFAULT_SPEED, y: 0 };
   private readonly mothership = new Mothership();
@@ -64,7 +64,7 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
         y: enemy.getPosition().y + this.position.y,
       };
 
-      if (Math.random() > Wave.MOTHERSHIP_DAMAGE_RATIO) {
+      if (enemy.boss || Math.random() > Wave.MOTHERSHIP_DAMAGE_RATIO) {
         return;
       }
       while (enemy?.isAlive) {
