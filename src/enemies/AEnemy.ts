@@ -12,12 +12,12 @@ export abstract class AEnemy extends ABlinkSprite {
   protected cooldown = rand(AEnemy.MIN_COOLDOWN, AEnemy.MAX_COOLDOWN);
 
   constructor(
-    gridPos: Readonly<Vector2>,
+    yGridPos: number,
     public readonly score: number,
     public readonly boss = false,
     private lives = 2
   ) {
-    super(gridPos, { x: 1, y: 0 }, 1, boss ? AEnemy.BOSS_SIZE : 1);
+    super({ x: 0, y: yGridPos }, { x: 1, y: 0 }, 1, boss ? AEnemy.BOSS_SIZE : 1);
     if (this.boss) {
       this.lives *= AEnemy.BOSS_LIFE_MULTIPLIER;
       this.score *= AEnemy.BOSS_LIFE_MULTIPLIER;

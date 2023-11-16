@@ -34,7 +34,7 @@ export class App {
 	private readonly enemyProjectiles = new ProjectilePool(5, 1);
 	private readonly bonuses = new Pool(
 		...Array.from({ length: 8 }).map(
-			(_, index) => new Bonus(index === 0 ? "H" : index % 2 === 0 ? "S" : "L")
+			(_, index) => new Bonus(index === 7 ? "H" : index % 2 === 0 ? "S" : "L")
 		)
 	);
 	private readonly explosions = new Pool(
