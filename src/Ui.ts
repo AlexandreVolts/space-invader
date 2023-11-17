@@ -8,10 +8,12 @@ export class Ui implements IDrawable {
   private static readonly RIGHT_PADDING = 80;
   private static readonly DURATION = 2;
   private static readonly ANIMATION_SPEED = 8;
+  private static readonly BLINK_DURATION = 0.5;
   public score = 0;
   private bestScore = parseInt(localStorage.getItem("score") || "0");
   private currentWaveHighlightDelay = 0;
   private bestScoreHighlightDelay = 0;
+  private time = 0;
   private _state: UiState = "menu";
   private _currentWave = 0;
 
@@ -21,8 +23,10 @@ export class Ui implements IDrawable {
     ctx.fillText(this.state === "win" ? "Congratulations!" : "Game over", App.WIDTH * 0.5, App.HEIGHT * 0.3);
     ctx.font = `${16 + Math.sin(this.bestScoreHighlightDelay) * Ui.ANIMATION_SPEED}px Joystick`;
     ctx.fillText(`Score: ${this.score * 100}`, App.WIDTH * 0.5, App.HEIGHT * 0.4);
-    ctx.font = "16px Joystick";
-    ctx.fillText("Press Enter to restart", App.WIDTH * 0.5, App.HEIGHT * 0.5);
+    if (~~(this.time / Ui.BLINK_DURATION) % 2 === 0) {
+      ctx.font = "16px Joystick";
+      ctx.fillText("Press Enter to restart", App.WIDTH * 0.5, App.HEIGHT * 0.5);
+    }
   }
   private drawMenu(ctx: CanvasRenderingContext2D) {
     ctx.font = "30px Joystick";
@@ -32,8 +36,10 @@ export class Ui implements IDrawable {
       ctx.font = "16px Joystick";
       ctx.fillText(`Best Score: ${this.bestScore * 100}`, App.WIDTH * 0.5, App.HEIGHT * 0.4);
     }
-    ctx.font = "16px Joystick";
-    ctx.fillText("Press Enter to start", App.WIDTH * 0.5, App.HEIGHT * 0.5);
+    if (~~(this.time / Ui.BLINK_DURATION) % 2 === 0) {
+      ctx.font = "16px Joystick";
+      ctx.fillText("Press Enter to start", App.WIDTH * 0.5, App.HEIGHT * 0.5);
+    }
   }
 
   public reset() {
@@ -54,6 +60,7 @@ export class Ui implements IDrawable {
     SoundManager.play("gameover");
   }
   public update(delta: number) {
+    this.time += delta;
     this.currentWaveHighlightDelay = Math.max(
       0, this.currentWaveHighlightDelay - delta
     );

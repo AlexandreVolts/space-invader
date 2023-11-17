@@ -10,6 +10,7 @@ type OnEnemyKilledCallback = (position: Vector2) => void;
 
 export class Wave extends Array<AEnemy | null> implements IDrawable {
   private static readonly DEFAULT_SPEED = 20;
+  private static readonly MOTHERSHIP_SPAWN_LIMIT = 10;
   private static readonly SPEED_ACCELERATION = 1.15;
   private static readonly MOTHERSHIP_DAMAGE_RATIO = 0.4;
   private readonly position: Vector2 = { x: 0, y: 0 };
@@ -29,11 +30,7 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
     let index = x + y * this.size.x;
     let selected = this[index];
 
-    while (
-      !selected?.isAlive &&
-      index >= 0 &&
-      index < this.size.x * this.size.y
-    ) {
+    while (!selected?.isAlive && index >= 0 && index < this.size.x * this.size.y) {
       y = (y + 1) % this.size.y;
       x += y === 0 ? dir : 0;
       index = x + y * this.size.x;
@@ -54,6 +51,20 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
       i += this.size.x;
     }
     return ~~(i / this.size.x) + 1;
+  }
+  private hitEnemy(enemy: AEnemy, onEnemyKilled: OnEnemyKilledCallback, position: Vector2) {
+    enemy.hit();
+    if (enemy.isAlive) {
+      return (0);
+    }
+    onEnemyKilled(position);
+    if (
+      this.mothership.isAlive &&
+      this.filter((enemy) => enemy?.isAlive).length < Wave.MOTHERSHIP_SPAWN_LIMIT
+    ) {
+      this.mothership.cancel();
+    }
+    return (enemy.score);
   }
   private killRandomEnemies(onEnemyKilled: OnEnemyKilledCallback) {
     let score = 0;
@@ -97,12 +108,8 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
         if (!enemy.collidesWith(position)) {
           return;
         }
-        enemy.hit();
+        score += this.hitEnemy(enemy, onEnemyKilled, projectile.getHitPoint());
         projectile.kill();
-        if (!enemy.isAlive) {
-          score += enemy.score;
-          onEnemyKilled(projectile.getHitPoint());
-        }
       });
     });
     return score;
@@ -119,11 +126,7 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
       if (!enemy.collidesWithXAxis(x - this.position.x)) {
         return;
       }
-      enemy.hit();
-      if (!enemy.isAlive) {
-        score += enemy.score;
-        onEnemyKilled(position);
-      }
+      this.hitEnemy(enemy, onEnemyKilled, position)
     });
     return score;
   }

@@ -5,8 +5,8 @@ import { rand } from "../rand";
 
 export class Mothership extends ASpaceInvaderSprites {
   private static readonly SPEED = 140;
-  private static readonly MIN_DELAY = 15;
-  private static readonly MAX_DELAY = 45;
+  private static readonly MIN_DELAY = 25;
+  private static readonly MAX_DELAY = 50;
   private delay = rand(Mothership.MIN_DELAY, Mothership.MAX_DELAY);
   private vy = 0;
   private alive = true;
@@ -17,6 +17,11 @@ export class Mothership extends ASpaceInvaderSprites {
     this.position.y = App.TILE_SIZE * 2;
   }
 
+  public cancel() {
+    if (this.delay <= 0) return;
+    this.alive = false;
+    this.position.x = App.WIDTH;
+  }
   public kill() {
     this.alive = false;
     SoundManager.play("mothership-hit");

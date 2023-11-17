@@ -74,7 +74,7 @@ export class App {
 	}
 
 	private reset() {
-		const wave = EnemyPatternGenerator.generate(14)!;
+		const wave = EnemyPatternGenerator.generate(0)!;
 
 		this.ui.reset();
 		this.lives = Lifebar.NB;
@@ -162,18 +162,6 @@ export class App {
 				this.onEnemyKilled
 			);
 		}
-		if (this.ui.state === "running" && this.wave.areAllEnemiesDead) {
-			this.ui.incrementWave();
-			this.shields.forEach((shield) => shield.regenerate());
-
-			const wave = EnemyPatternGenerator.generate(this.ui.currentWave);
-			if (!wave) {
-				this.ui.end("win");
-			}
-			else {
-				this.wave = wave;
-			}
-		}
 		if (this.ui.state !== "running" && this.keyboard.isPressed("Enter")) {
 			this.reset();
 		}
@@ -198,6 +186,18 @@ export class App {
 					: 0
 		);
 		this.ui.score += score;
+		if (this.ui.state === "running" && this.wave.areAllEnemiesDead) {
+			this.ui.incrementWave();
+			this.shields.forEach((shield) => shield.regenerate());
+
+			const wave = EnemyPatternGenerator.generate(this.ui.currentWave);
+			if (!wave) {
+				this.ui.end("win");
+			}
+			else {
+				this.wave = wave;
+			}
+		}
 		this.updateProjectiles();
 		this.updateBonuses();
 		this.wave
@@ -216,6 +216,10 @@ export class App {
 	public render = (elapsedTime: number) => {
 		this.ctx.clearRect(0, 0, App.WIDTH, App.HEIGHT);
 		this.update((elapsedTime - this.lastDeltaTime) / 1000);
+		if (this.player.isBlinking) {
+			this.ctx.save();
+			this.ctx.translate(Math.random() * 4, Math.random() * 4);
+		}
 		this.gameElements.forEach((elem) => {
 			if (this.ui.state !== "running" && elem instanceof Player) return;
 			elem.draw(this.ctx);
@@ -225,6 +229,7 @@ export class App {
 		}
 		this.laser.draw(this.ctx, this.player.getPosition());
 		this.lifebar.draw(this.ctx, this.lives);
+		this.ctx.restore();
 		this.lastDeltaTime = elapsedTime;
 		requestAnimationFrame(this.render);
 	};

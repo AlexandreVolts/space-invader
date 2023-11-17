@@ -29,4 +29,7 @@ export class ABlinkSprite extends ASpaceInvaderSprites {
     }
     super.draw(ctx);
   }
+  public get isBlinking() {
+    return (this.hitMarker > 0);
+  }
 }
