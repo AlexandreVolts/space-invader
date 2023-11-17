@@ -116,7 +116,7 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
         y: enemy.getPosition().y + this.position.y,
       };
 
-      if (x < position.x || x > position.x + App.TILE_SIZE) {
+      if (!enemy.collidesWithXAxis(x - this.position.x)) {
         return;
       }
       enemy.hit();

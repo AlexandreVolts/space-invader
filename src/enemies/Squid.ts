@@ -3,7 +3,7 @@ import { AEnemy } from "./AEnemy";
 
 export class Squid extends AEnemy {
   constructor(position: Vector2, boss: boolean) {
-    super(2, 4, boss, 2);
+    super(1, 4, boss, 2);
     this.position = position;
   }
 

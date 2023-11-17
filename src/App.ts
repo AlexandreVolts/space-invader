@@ -74,7 +74,7 @@ export class App {
 	}
 
 	private reset() {
-		const wave = EnemyPatternGenerator.generate(0)!;
+		const wave = EnemyPatternGenerator.generate(14)!;
 
 		this.ui.reset();
 		this.lives = Lifebar.NB;

@@ -4,9 +4,10 @@ import { Squid } from "./Squid";
 import { Wave } from "../Wave";
 import { App } from "../App";
 import json from "./../json/waves.json";
+import { Phantom } from "./Phantom";
 
 export abstract class EnemyPatternGenerator {
-  private static readonly enemies = [Crab, Crane, Squid];
+  private static readonly enemies = [Crab, Crane, Squid, Phantom];
 
   public static generate(id: number): Wave | undefined {
     const pattern = json.data[id]?.data;

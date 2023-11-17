@@ -24,6 +24,12 @@ export abstract class AEnemy extends ABlinkSprite {
     }
   }
 
+  public collidesWithXAxis(x: number) {
+    return (
+      x > this.position.x &&
+      x < this.position.x + App.TILE_SIZE * (this.boss ? AEnemy.BOSS_SIZE : 1)
+    );
+  }
   public hit() {
     this.lives--;
     this.blink();
