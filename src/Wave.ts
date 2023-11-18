@@ -10,11 +10,12 @@ type OnEnemyKilledCallback = (position: Vector2) => void;
 
 export class Wave extends Array<AEnemy | null> implements IDrawable {
   private static readonly DEFAULT_SPEED = 20;
+  private static readonly TRANSITION_DURATION = 4;
   private static readonly MOTHERSHIP_SPAWN_LIMIT = 10;
   private static readonly SPEED_ACCELERATION = 1.15;
   private static readonly MOTHERSHIP_DAMAGE_RATIO = 0.4;
-  private readonly position: Vector2 = { x: 0, y: 0 };
-  private readonly velocity: Vector2 = { x: Wave.DEFAULT_SPEED, y: 0 };
+  private readonly position: Vector2 = { x: 0, y: -App.HEIGHT * 0.5 };
+  private readonly velocity: Vector2 = { x: Wave.DEFAULT_SPEED * Math.sign(Math.random() - 0.5), y: 0 };
   private readonly mothership = new Mothership();
 
   constructor(private readonly size: Readonly<Vector2>) {
@@ -145,13 +146,17 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
   }
   public update(delta: number) {
     const leftPadding = -this.getHorizontalPadding(1) * App.TILE_SIZE;
-    const rightPadding =
-      App.WIDTH + this.getHorizontalPadding(-1) * App.TILE_SIZE;
+    const rightPadding = App.WIDTH + this.getHorizontalPadding(-1) * App.TILE_SIZE;
 
+    if (this.position.y < 0) {
+      this.position.y += (App.HEIGHT * 0.5) * (delta / Wave.TRANSITION_DURATION);
+      this.position.x = (App.WIDTH - App.TILE_SIZE * this.size.x) / 2;
+    }
     this.position.x += this.velocity.x * delta;
     this.position.y += this.velocity.y * delta;
     this.forEach((enemy) => enemy?.update(delta));
     this.mothership.update(delta);
+
     if (
       this.position.x >= leftPadding &&
       this.position.x + this.size.x * App.TILE_SIZE <= rightPadding

@@ -5,6 +5,7 @@ import { Vector2 } from "./Vector2";
 export class Player extends ABlinkSprite  {
   private static readonly SPEED_X = 200;
   private vx = 0;
+  public isFiring = false;
 
   constructor() {
     super({ x: 4, y: 0 });

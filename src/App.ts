@@ -108,6 +108,7 @@ export class App {
 			if (this.player.collidesWith(projectile.getHitPoint())) {
 				this.lives--;
 				projectile.kill();
+				this.player.isFiring = false;
 				this.player.blink();
 				SoundManager.play("player-hit");
 				if (this.lives === 0) {
@@ -121,6 +122,7 @@ export class App {
 				.forEach((shield) => {
 					if (shield.collidesWith(projectile.getHitPoint())) {
 						projectile.kill();
+						this.player.isFiring = false;
 					}
 				});
 		});
@@ -166,16 +168,15 @@ export class App {
 			this.reset();
 		}
 		if (this.ui.state === "running") {
-			if (
-				this.keyboard.isPressed("ArrowUp") ||
-				this.keyboard.isPressed("Space")
-			) {
-				if (!this.laser.isActive) {
-					this.playerProjectiles.trigger(this.player.getPosition());
-				}
+			if (this.keyboard.isPressed("ArrowUp")) {
+				this.player.isFiring = true;
 			}
 			if (this.keyboard.isPressed("ArrowDown")) {
 				this.laser.trigger();
+				this.player.isFiring = false;
+			}
+			if (this.player.isFiring) {
+				this.playerProjectiles.trigger(this.player.getPosition());
 			}
 		}
 		this.player.move(
@@ -196,6 +197,7 @@ export class App {
 			}
 			else {
 				this.wave = wave;
+				SoundManager.play("wave");
 			}
 		}
 		this.updateProjectiles();

@@ -46,6 +46,7 @@ export class Ui implements IDrawable {
     this.score = 0;
     this._state = "running";
     this._currentWave = 0;
+    this.currentWaveHighlightDelay = Ui.DURATION;
   }
   public incrementWave() {
     this._currentWave++;
@@ -93,6 +94,11 @@ export class Ui implements IDrawable {
     ctx.font = `${16 + Math.sin(this.currentWaveHighlightDelay * Ui.ANIMATION_SPEED)}px Joystick`;
     ctx.fillText("Wave: ", App.WIDTH - Ui.RIGHT_PADDING, 50);
     ctx.fillText(`${this._currentWave + 1}`, App.WIDTH - 10, 50);
+    if (this.currentWaveHighlightDelay > 0) {
+      ctx.font = "30px Joystick";
+      ctx.textAlign = "center";
+      ctx.fillText(`Wave ${this._currentWave + 1}`, App.WIDTH * 0.5, App.HEIGHT * 0.4);
+    }
     if (this.state === "lose" || this.state === "win") {
       this.drawGameover(ctx);
     }

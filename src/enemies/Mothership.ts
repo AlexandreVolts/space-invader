@@ -29,7 +29,7 @@ export class Mothership extends ASpaceInvaderSprites {
   public update(delta: number) {
     this.delay -= delta;
     if (this.delay > 0) return;
-    if (this.delay >= -delta) SoundManager.play("mothership");
+    if (this.delay >= -delta && this.isAlive) SoundManager.play("mothership");
     this.position.x += Mothership.SPEED * delta;
     this.position.y += this.vy;
     if (!this.isAlive) {
