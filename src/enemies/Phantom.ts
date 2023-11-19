@@ -6,7 +6,7 @@ export class Phantom extends AEnemy {
   private time = 0;
   // TODO: Finish Phantom class.
   constructor(position: Vector2, boss: boolean) {
-    super(3, 4, boss, 2);
+    super(3, 4, boss);
     this.position = position;
   }
 

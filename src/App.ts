@@ -30,7 +30,7 @@ export class App {
 	private readonly ui = new Ui();
 	private readonly lifebar = new Lifebar();
 
-	private readonly playerProjectiles: ProjectilePool = new ProjectilePool(5);
+	private readonly playerProjectiles: ProjectilePool = new ProjectilePool(6);
 	private readonly enemyProjectiles = new ProjectilePool(5, 1);
 	private readonly bonuses = new Pool(
 		...Array.from({ length: 8 }).map(
@@ -74,7 +74,7 @@ export class App {
 	}
 
 	private reset() {
-		const wave = EnemyPatternGenerator.generate(0)!;
+		const wave = EnemyPatternGenerator.generate(18)!;
 
 		this.ui.reset();
 		this.lives = Lifebar.NB;

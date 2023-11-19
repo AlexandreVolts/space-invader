@@ -15,7 +15,7 @@ export abstract class AEnemy extends ABlinkSprite {
     yGridPos: number,
     public readonly score: number,
     public readonly boss = false,
-    private lives = 2
+    private lives = 4
   ) {
     super({ x: 0, y: yGridPos }, { x: 1, y: 0 }, 1, boss ? AEnemy.BOSS_SIZE : 1);
     if (this.boss) {
