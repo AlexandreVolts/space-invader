@@ -1,37 +1,159 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Space Invader</title>
-		<meta charset="utf-8" />
-		<link rel="stylesheet" href="style.css" />
-	</head>
-	<body style="background-color: black;">
-		<div class="wrapper">
-			<canvas></canvas>
-		</div>
-		<div style="display: none;">
-			<img src="assets/images/background-0.png" alt="" id="background-0" />
-			<img src="assets/images/background-1.png" alt="" id="background-1" />
-			<img src="assets/images/background-2.png" alt="" id="background-2" />
-			<img src="assets/images/bonuses.png" alt="" id="bonuses" />
-			<img src="assets/images/health.png" alt="" id="health" />
-			<img src="assets/images/space-invaders.png" alt="" id="space-invaders" />
+  <head>
+    <title>Space Invader</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="wrapper">
+      <div class="help">
+        <h2>Controls</h2>
+        <ul class="help-section">
+          <li>
+            <span style="display: flex">
+              <span
+                class="icon help-icon"
+                style="background-position: calc(-40px * 5) calc(-40px * 3)"
+              ></span>
+              <span
+                class="icon help-icon"
+                style="background-position: calc(-40px * 6) calc(-40px * 3)"
+              ></span>
+            </span>
+            <span class="help-text">Move</span>
+          </li>
+          <li>
+            <span
+              class="icon help-icon"
+              style="
+                background-position: calc(-40px * 5) calc(-40px * 3);
+                transform: rotate(90deg);
+              "
+            ></span>
+            <span class="help-text">Shoot</span>
+          </li>
+          <li>
+            <span
+              class="icon help-icon"
+              style="
+                background-position: calc(-40px * 5) calc(-40px * 3);
+                transform: rotate(-90deg);
+              "
+            ></span>
+            <span class="help-text">Laser</span>
+          </li>
+        </ul>
+        <h2>Enemies</h2>
+        <ul class="help-section">
+          <li>
+            <span
+              class="icon help-icon enemy-icon"
+              style="background-position: 0px 0px"
+            ></span>
+            <span
+              class="help-text"
+              style="display: flex; flex-direction: column"
+            >
+              <span>Crab</span>
+              <span class="help-description">The classic</span>
+            </span>
+          </li>
+          <li>
+            <span
+              class="icon help-icon enemy-icon"
+              style="background-position: 0px calc(-40px * 4)"
+            ></span>
+            <span
+              class="help-text"
+              style="display: flex; flex-direction: column"
+            >
+              <span>Crane</span>
+              <span class="help-description">The robust</span>
+            </span>
+          </li>
+          <li>
+            <span
+              class="icon help-icon enemy-icon"
+              style="background-position: 0px calc(-40px * 1)"
+            ></span>
+            <span
+              class="help-text"
+              style="display: flex; flex-direction: column"
+            >
+              <span>Squid</span>
+              <span class="help-description">The tommy gun</span>
+            </span>
+          </li>
+          <li>
+            <span
+              class="icon help-icon enemy-icon"
+              style="background-position: 0px calc(-40px * 3)"
+            ></span>
+            <span
+              class="help-text"
+              style="display: flex; flex-direction: column"
+            >
+              <span>Phantom</span>
+              <span class="help-description">The hidden</span>
+            </span>
+          </li>
+        </ul>
+        <h2>Bonus</h2>
+        <ul class="help-section">
+          <li>
+            <span
+              class="icon bonus-icon"
+              style="background-position: -40px calc(-40px * 1)"
+            ></span>
+            <span class="help-text">+ Score</span>
+          </li>
+          <li>
+            <span
+              class="icon bonus-icon"
+              style="background-position: -40px calc(-40px * 2)"
+            ></span>
+            <span class="help-text">+ Laser</span>
+          </li>
+          <li>
+            <span
+              class="icon bonus-icon"
+              style="background-position: -40px calc(-40px * 3)"
+            ></span>
+            <span class="help-text">+ Health</span>
+          </li>
+        </ul>
+      </div>
+      <div class="game">
+        <canvas></canvas>
+      </div>
+    </main>
+    <footer>
+      <h2>Credits</h2>
+    </footer>
+    <div style="display: none">
+      <img src="assets/images/background-0.png" alt="" id="background-0" />
+      <img src="assets/images/background-1.png" alt="" id="background-1" />
+      <img src="assets/images/background-2.png" alt="" id="background-2" />
+      <img src="assets/images/bonuses.png" alt="" id="bonuses" />
+      <img src="assets/images/health.png" alt="" id="health" />
+      <img src="assets/images/space-invaders.png" alt="" id="space-invaders" />
 
-			<audio src="assets/sfx/player-hit.wav" id="player-hit" />
-			<audio src="assets/sfx/enemy-hit.wav" id="enemy-hit" />
-			<audio src="assets/sfx/shield-hit.wav" id="shield-hit" />
-			<audio src="assets/sfx/bonus.wav" id="bonus" />
-			<audio src="assets/sfx/explosion.wav" id="explosion" />
-			<audio src="assets/sfx/wave.wav" id="wave" />
-			<audio src="assets/sfx/laser.wav" id="laser" />
-			<audio src="assets/sfx/laser-ready.wav" id="laser-ready" />
-			<audio src="assets/sfx/health-bonus.wav" id="health-bonus" />
-			<audio src="assets/sfx/mothership.wav" id="mothership" />
-			<audio src="assets/sfx/mothership-hit.wav" id="mothership-hit" />
-			<audio src="assets/sfx/gameover.wav" id="gameover" />
-			<audio src="assets/sfx/restart.wav" id="restart" />
-			<audio src="assets/sfx/theme.wav" id="theme" loop />
-		</div>
-		<script src="/src/App.ts"></script>
-	</body>
+      <audio src="assets/sfx/player-hit.wav" id="player-hit" />
+      <audio src="assets/sfx/enemy-hit.wav" id="enemy-hit" />
+      <audio src="assets/sfx/shield-hit.wav" id="shield-hit" />
+      <audio src="assets/sfx/bonus.wav" id="bonus" />
+      <audio src="assets/sfx/explosion.wav" id="explosion" />
+      <audio src="assets/sfx/wave.wav" id="wave" />
+      <audio src="assets/sfx/laser.wav" id="laser" />
+      <audio src="assets/sfx/laser-ready.wav" id="laser-ready" />
+      <audio src="assets/sfx/health-bonus.wav" id="health-bonus" />
+      <audio src="assets/sfx/mothership.wav" id="mothership" />
+      <audio src="assets/sfx/mothership-hit.wav" id="mothership-hit" />
+      <audio src="assets/sfx/gameover.wav" id="gameover" />
+      <audio src="assets/sfx/restart.wav" id="restart" />
+      <audio src="assets/sfx/theme.wav" id="theme" loop />
+    </div>
+    <script src="/src/App.ts"></script>
+  </body>
 </html>
