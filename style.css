@@ -74,6 +74,10 @@ footer {
 .help-text {
   padding-left: 15px;
 }
+.help-enemy-description {
+  display: flex;
+  flex-direction: column;
+}
 .help-description {
   font-size: 12px;
   color: lightgray;

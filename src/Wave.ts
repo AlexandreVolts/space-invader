@@ -25,6 +25,14 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
   private apply(callback: (enemy: AEnemy) => void) {
     (this.filter((enemy) => enemy?.isAlive) as AEnemy[]).forEach(callback);
   }
+  private isBossNear(x: number) {
+    for (let y = this.size.y - 1; y >= 0; y--) {
+      if (this[x + y * this.size.x]?.boss) {
+        return (true);
+      }
+    }
+    return (false);
+  }
   private getHorizontalPadding(dir: Direction) {
     let x = dir === -1 ? this.size.x - 1 : 0;
     let y = 0;
@@ -37,19 +45,25 @@ export class Wave extends Array<AEnemy | null> implements IDrawable {
       index = x + y * this.size.x;
       selected = this[index];
     }
-    if (selected?.boss) {
-      if (dir === -1) {
-        x += AEnemy.BOSS_SIZE - 1;
-      }
+    
+    if (dir !== -1) {
+      return (x);
     }
-    return dir === 1 ? x : this.size.x - 1 - x;
+    if (selected?.boss) {
+      x += AEnemy.BOSS_SIZE - 1;
+    }
+    else {
+      if (this.isBossNear(x - 1))
+        x++;
+    }
+    return (this.size.x - 1 - x);
   }
   private getVerticalSize() {
     let i = this.length - 1;
 
     for (; i >= 0 && !this[i]?.isAlive; i--);
     if (this[i]?.boss) {
-      i += this.size.x;
+      i += this.size.x * 2;
     }
     return ~~(i / this.size.x) + 1;
   }

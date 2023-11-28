@@ -13,15 +13,16 @@ import { Explosion } from "./Explosion";
 import { Vector2 } from "./Vector2";
 import { Bonus } from "./Bonus";
 import { SoundManager } from "./SoundManager";
+import { ProgressBar } from "./ProgressBar";
 
 export class App {
 	private static readonly GAME_SIZE_COEFF = 0.6;
 	private static readonly BONUS_COEF = 0.15;
-	private static readonly NB_SHIELDS = 4;
 	public static readonly TILE_SIZE = 35;
 	public static readonly WIDTH = 720 * App.GAME_SIZE_COEFF;
 	public static readonly HEIGHT = 1280 * App.GAME_SIZE_COEFF;
 	public static readonly SCORE_MULTIPLIER = 100;
+	public static readonly NB_SHIELDS = 4;
 	private readonly canvas: HTMLCanvasElement;
 	private readonly ctx: CanvasRenderingContext2D;
 	private readonly keyboard = new Keyboard();
@@ -29,6 +30,7 @@ export class App {
 	private readonly background = new TiledBackground();
 	private readonly ui = new Ui();
 	private readonly lifebar = new Lifebar();
+	private readonly firebar = new ProgressBar();
 
 	private readonly playerProjectiles: ProjectilePool = new ProjectilePool(6);
 	private readonly enemyProjectiles = new ProjectilePool(5, 1);
@@ -57,10 +59,7 @@ export class App {
 		this.ctx = this.canvas.getContext("2d")!;
 		this.ctx.imageSmoothingEnabled = false;
 		Array.from({ length: App.NB_SHIELDS }).forEach((_, index) => {
-			const width = App.WIDTH - App.TILE_SIZE;
-			const x = App.TILE_SIZE * 0.75 + width * (index / App.NB_SHIELDS);
-
-			this.shields.push(new Shield(x));
+			this.shields.push(new Shield(index));
 		});
 		this.gameElements.push(this.background);
 		this.gameElements.push(this.playerProjectiles);
@@ -74,7 +73,7 @@ export class App {
 	}
 
 	private reset() {
-		const wave = EnemyPatternGenerator.generate(18)!;
+		const wave = EnemyPatternGenerator.generate(0)!;
 
 		this.ui.reset();
 		this.lives = Lifebar.NB;
@@ -231,6 +230,15 @@ export class App {
 		}
 		this.laser.draw(this.ctx, this.player.getPosition());
 		this.lifebar.draw(this.ctx, this.lives);
+		if (this.ui.state === "running") {
+			this.firebar.draw(
+				this.ctx,
+				this.playerProjectiles.filter((p) => !p.isAlive).length / 5, {
+					x: this.player.getPosition().x - App.TILE_SIZE / 2.6,
+					y: this.player.getPosition().y + App.TILE_SIZE,
+				}
+			);
+		}
 		this.ctx.restore();
 		this.lastDeltaTime = elapsedTime;
 		requestAnimationFrame(this.render);

@@ -7,9 +7,12 @@ export class Shield extends ABlinkSprite {
   private static readonly NB_STATES = 4;
   private lives = Shield.NB_LIVES;
 
-  constructor(x: number) {
+  constructor(index: number) {
     super({ x: 3, y: 1 }, { x: 0, y: 4 }, 2);
-    this.position.x = x;
+    
+    const PADDING = (App.WIDTH - App.TILE_SIZE * 2 * App.NB_SHIELDS) / (App.NB_SHIELDS + 1);
+
+    this.position.x = PADDING + (App.TILE_SIZE * 2 + PADDING) * index;
     this.position.y = App.HEIGHT - App.TILE_SIZE * 4;
   }
   public reset() {

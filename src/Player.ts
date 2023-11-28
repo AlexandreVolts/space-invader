@@ -2,8 +2,8 @@ import { ABlinkSprite } from "./ABlinkSprite";
 import { App } from "./App";
 import { Vector2 } from "./Vector2";
 
-export class Player extends ABlinkSprite  {
-  private static readonly SPEED_X = 200;
+export class Player extends ABlinkSprite {
+  private static readonly SPEED_X = 185;
   private vx = 0;
   public isFiring = false;
 
@@ -19,7 +19,10 @@ export class Player extends ABlinkSprite  {
   public update(delta: number) {
     super.update(delta);
     this.position.x += this.vx * delta;
-    this.position.x = Math.max(0, Math.min(App.WIDTH - App.TILE_SIZE, this.position.x));
+    this.position.x = Math.max(
+      0,
+      Math.min(App.WIDTH - App.TILE_SIZE, this.position.x)
+    );
   }
   public getPosition(): Readonly<Vector2> {
     return this.position;
